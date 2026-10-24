@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f5f6f8">
+  <title>Paradise — остатки</title>
+  <script src="https://telegram.org/js/telegram-web-app.js?64"></script>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: var(--tg-theme-bg-color, #f5f6f8);
+      --card: var(--tg-theme-secondary-bg-color, #fff);
+      --text: var(--tg-theme-text-color, #17212b);
+      --muted: var(--tg-theme-hint-color, #718096);
+      --line: color-mix(in srgb, var(--text) 10%, transparent);
+      --accent: var(--tg-theme-button-color, #1689e5);
+      --accent-soft: #e8f4ff;
+      --green: #21865a;
+      --green-soft: #e6f5ed;
+      --shadow: 0 5px 18px rgba(25, 45, 65, .06);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 16px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      padding: 0 0 calc(84px + env(safe-area-inset-bottom));
+    }
+    button, input { font: inherit; }
+    .topbar { padding: calc(14px + env(safe-area-inset-top)) 18px 12px; }
+    .brandline { display: flex; align-items: center; justify-content: space-between; }
+    .brand { font-size: 13px; font-weight: 700; letter-spacing: .12em; color: var(--muted); text-transform: uppercase; }
+    .store { margin-top: 2px; font-size: 24px; font-weight: 750; letter-spacing: -.04em; }
+    .store-chip { background: var(--green-soft); color: var(--green); border-radius: 20px; padding: 7px 11px; font-size: 12px; font-weight: 700; }
+    main { padding: 0 16px; max-width: 680px; margin: 0 auto; }
+    .searchbox { position: sticky; top: 0; z-index: 3; padding: 4px 0 12px; background: var(--bg); }
+    .search { width: 100%; height: 48px; border: 1px solid var(--line); border-radius: 15px; background: var(--card); padding: 0 15px 0 43px; color: var(--text); outline: none; box-shadow: var(--shadow); }
+    .search:focus { border-color: var(--accent); }
+    .search-icon { position: absolute; left: 15px; top: 17px; color: var(--muted); font-size: 19px; pointer-events: none; }
+    .heading { display: flex; justify-content: space-between; align-items: end; margin: 8px 2px 12px; }
+    h1 { font-size: 21px; line-height: 1.2; margin: 0; letter-spacing: -.03em; }
+    .subheading { margin-top: 4px; color: var(--muted); font-size: 13px; }
+    .count { color: var(--muted); font-size: 13px; white-space: nowrap; }
+    .crumbs { display: flex; align-items: center; gap: 7px; overflow-x: auto; white-space: nowrap; margin: 0 0 12px; color: var(--muted); font-size: 13px; scrollbar-width: none; }
+    .crumbs button { border: 0; padding: 0; background: none; color: var(--accent); cursor: pointer; }
+    .group-list, .product-list { display: grid; gap: 9px; }
+    .group-card { border: 1px solid var(--line); border-radius: 17px; background: var(--card); padding: 15px; display: flex; align-items: center; gap: 13px; text-align: left; width: 100%; box-shadow: var(--shadow); cursor: pointer; color: inherit; }
+    .group-icon { width: 42px; height: 42px; display: grid; place-items: center; flex: none; border-radius: 13px; background: var(--accent-soft); color: var(--accent); font-size: 20px; }
+    .group-copy { flex: 1; min-width: 0; }
+    .group-name { display: block; font-weight: 700; }
+    .group-meta { display: block; color: var(--muted); font-size: 13px; margin-top: 3px; }
+    .chevron { color: #9aa6b2; font-size: 20px; }
+    .product-card { background: var(--card); border: 1px solid var(--line); border-radius: 17px; padding: 15px; box-shadow: var(--shadow); }
+    .product-name { font-weight: 650; line-height: 1.35; }
+    .product-info { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 11px 0 13px; }
+    .price { font-weight: 750; font-size: 18px; }
+    .stock { color: var(--green); background: var(--green-soft); border-radius: 20px; padding: 5px 9px; font-weight: 700; font-size: 12px; white-space: nowrap; }
+    .add-button { width: 100%; min-height: 42px; border: 0; border-radius: 12px; background: var(--accent); color: white; font-weight: 700; cursor: pointer; }
+    .add-button.added { color: var(--green); background: var(--green-soft); }
+    .qty-controls { display: flex; align-items: center; gap: 8px; }
+    .qty-button { width: 42px; height: 40px; border: 0; border-radius: 11px; background: var(--accent-soft); color: var(--accent); font-size: 20px; font-weight: 700; cursor: pointer; }
+    .qty-value { min-width: 24px; text-align: center; font-weight: 750; }
+    .remove-button { margin-left: auto; border: 0; background: transparent; color: #c0392b; font-weight: 650; cursor: pointer; }
+    .notice { color: var(--muted); font-size: 12px; text-align: center; padding: 18px 8px 4px; }
+    .empty { color: var(--muted); padding: 30px 15px; text-align: center; background: white; border-radius: 16px; }
+    .bottom-nav { position: fixed; z-index: 5; bottom: 0; left: 0; right: 0; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: rgba(255,255,255,.94); border-top: 1px solid var(--line); backdrop-filter: blur(15px); }
+    .nav-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; max-width: 680px; margin: auto; }
+    .nav-button { min-height: 48px; border: 0; border-radius: 14px; color: var(--muted); background: transparent; font-weight: 700; cursor: pointer; }
+    .nav-button.active { background: var(--accent-soft); color: var(--accent); }
+    .badge { display: inline-grid; place-items: center; min-width: 19px; height: 19px; margin-left: 5px; padding: 0 5px; border-radius: 11px; background: var(--accent); color: white; font-size: 11px; }
+    @media (min-width: 540px) {
+      .group-list { grid-template-columns: 1fr 1fr; }
+      .product-list { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brandline">
+      <div><div class="brand">Paradise</div><div class="store">Товары на складе</div></div>
+      <div class="store-chip">● Paradise</div>
+    </div>
+  </header>
+
+  <main>
+    <div class="searchbox">
+      <span class="search-icon">⌕</span>
+      <input class="search" id="search" type="search" placeholder="Найти товар" autocomplete="off" aria-label="Найти товар">
+    </div>
+    <div class="heading">
+      <div><h1 id="title">Категории</h1><div id="subtitle" class="subheading">Остатки обновляются из МоегоСклада</div></div>
+      <div id="count" class="count"></div>
+    </div>
+    <nav class="crumbs" id="crumbs" aria-label="Путь по категориям"></nav>
+    <section class="group-list" id="groups"></section>
+    <section class="product-list" id="products" hidden></section>
+    <div class="notice" id="notice">Макет: демонстрационные данные, подключение к МоемуСкладу ещё не настроено.</div>
+  </main>
+
+  <footer class="bottom-nav">
+    <div class="nav-inner">
+      <button class="nav-button active" id="stock-tab">Остатки</button>
+      <button class="nav-button" id="purchase-tab">Закупка <span class="badge" id="purchase-count" hidden>0</span></button>
+    </div>
+  </footer>
+
+  <script>
+    // Sample only; live inventory will come from the secured server API.
+    const demoInventory = {
+      "Одноразовые ЭСДН": {
+        "WAKA": {
+          "WAKA 20000 Extra": { goods: [
+            { name: "WAKA 20000 Extra — Ананас персик", stock: 2, price: 1650 },
+            { name: "WAKA 20000 Extra — Виноград Ягоды", stock: 1, price: 1650 },
+            { name: "WAKA 20000 Extra — Вишня клюква", stock: 1, price: 1650 }
+          ] },
+          "WAKA Jupiter 30000": { goods: [
+            { name: "WAKA Jupiter 30000 — Кола со льдом", stock: 1, price: 1590 }
+          ] },
+          "WAKA soPro 20000": { goods: [
+            { name: "WAKA soPRO 20000 — Киви Маракуйя Гуава", stock: 1, price: 1490 },
+            { name: "WAKA soPRO 20000 — Энергетик Чёрная Смородина", stock: 1, price: 1490 }
+          ] }
+        },
+        "PUFFMI": {
+          "PUFFMI 9000": { goods: [
+            { name: "PUFFMI 9000 — Ледяной Виноград Алоэ", stock: 1, price: 1250 }
+          ] }
+        }
+      },
+      "Злая Монашка": {
+        "Самоубийца": { goods: [
+          { name: "Самоубийца V2 Danger Sour 25k", stock: 1, price: 0 }
+        ] }
+      }
+    };
+
+    const tg = window.Telegram?.WebApp;
+    const showDemo = new URLSearchParams(window.location.search).get("demo") === "1";
+    tg?.ready();
+    tg?.expand();
+
+    let inventory = demoInventory;
+    let inventoryStatus = "demo";
+    const state = { path: [], purchase: [], purchaseMode: false, search: "" };
+    const groupsEl = document.getElementById("groups");
+    const productsEl = document.getElementById("products");
+
+    function getNode(path) {
+      return path.reduce((node, part) => node?.[part], inventory);
+    }
+    function allProducts(node, path = []) {
+      let result = [];
+      if (!node || typeof node !== "object" || Array.isArray(node)) return result;
+      if (Array.isArray(node.goods)) {
+        result.push(...node.goods.map(product => ({ ...product, path })));
+      }
+      Object.entries(node || {}).forEach(([name, child]) => {
+        if (name === "goods") return;
+        if (!child || typeof child !== "object" || Array.isArray(child)) return;
+        const nextPath = [...path, name];
+        result.push(...allProducts(child, nextPath));
+      });
+      return result;
+    }
+    function convertStockTree(tree) {
+      return Object.fromEntries(Object.entries(tree || {}).map(([name, node]) => {
+        const children = convertStockTree(node._children || {});
+        if (node._goods?.length) children.goods = node._goods;
+        return [name, children];
+      }));
+    }
+    function quantity(node) {
+      return allProducts(node).reduce((sum, product) => sum + product.stock, 0);
+    }
+    function makeButton(label, callback, className) {
+      const button = document.createElement("button");
+      button.className = className;
+      button.textContent = label;
+      button.addEventListener("click", callback);
+      return button;
+    }
+    function render() {
+      const query = state.search.trim().toLocaleLowerCase("ru");
+      const title = document.getElementById("title");
+      const subtitle = document.getElementById("subtitle");
+      const crumbs = document.getElementById("crumbs");
+      const count = document.getElementById("count");
+      const notice = document.getElementById("notice");
+      groupsEl.replaceChildren();
+      productsEl.replaceChildren();
+      crumbs.replaceChildren();
+
+      const isSearch = Boolean(query);
+      const isPurchase = state.purchaseMode;
+      const current = getNode(state.path);
+      const childEntries = Object.entries(current || inventory).filter(([name]) => name !== "goods");
+      const hasChildren = childEntries.length > 0;
+      const showProducts = isSearch || isPurchase || Boolean(current?.goods?.length && !hasChildren);
+      title.textContent = isPurchase ? "Список закупки" : isSearch ? "Результаты поиска" : state.path[state.path.length - 1] || "Категории";
+      subtitle.textContent = isPurchase ? "Черновик, склад не изменяется" : isSearch ? "Поиск по всем товарам в наличии" : "Остатки из МоегоСклада";
+      notice.hidden = inventoryStatus === "live" || isPurchase || isSearch;
+      if (inventoryStatus === "demo") notice.textContent = "Макет: демонстрационные данные, подключение к МоемуСкладу ещё не настроено.";
+      if (inventoryStatus === "error") notice.textContent = "Не удалось получить остатки. Откройте приложение из Telegram и проверьте соединение.";
+      const purchaseTotal = state.purchase.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+      count.textContent = isPurchase ? `${state.purchase.length} позиций · ${purchaseTotal.toLocaleString("ru-RU")} ₽` : "";
+
+      const homeCrumb = makeButton("Все категории", () => { state.path = []; state.purchaseMode = false; render(); }, "");
+      crumbs.append(homeCrumb);
+      state.path.forEach((part, index) => {
+        const separator = document.createElement("span"); separator.textContent = "›"; crumbs.append(separator);
+        crumbs.append(makeButton(part, () => { state.path = state.path.slice(0, index + 1); state.purchaseMode = false; render(); }, ""));
+      });
+
+      const products = isPurchase ? state.purchase.map(item => ({ ...item.product, requested: item.quantity }))
+        : isSearch ? allProducts(inventory).filter(product => product.name.toLocaleLowerCase("ru").includes(query))
+        : (current?.goods || []).map(product => ({ ...product, path: state.path }));
+
+      if (!showProducts && !isPurchase && !isSearch) {
+        childEntries.forEach(([name, child]) => {
+          const card = document.createElement("button");
+          card.className = "group-card";
+          const icon = document.createElement("span"); icon.className = "group-icon"; icon.textContent = "▦";
+          const copy = document.createElement("span"); copy.className = "group-copy";
+          const label = document.createElement("span"); label.className = "group-name"; label.textContent = name;
+          const meta = document.createElement("span"); meta.className = "group-meta"; meta.textContent = `${quantity(child)} шт. в наличии`;
+          const arrow = document.createElement("span"); arrow.className = "chevron"; arrow.textContent = "›";
+          copy.append(label, meta); card.append(icon, copy, arrow);
+          card.addEventListener("click", () => { state.path.push(name); render(); });
+          groupsEl.append(card);
+        });
+        if (!childEntries.length && inventoryStatus === "live") {
+          const empty = document.createElement("div"); empty.className = "empty"; empty.textContent = "В этой группе сейчас нет товаров с остатком";
+          groupsEl.append(empty);
+        }
+      }
+
+      const showProductSection = showProducts || isPurchase || isSearch || products.length > 0;
+      if (showProductSection) {
+        productsEl.hidden = false;
+        products.forEach(product => {
+          const card = document.createElement("article"); card.className = "product-card";
+          const name = document.createElement("div"); name.className = "product-name"; name.textContent = product.name;
+          const info = document.createElement("div"); info.className = "product-info";
+          const price = document.createElement("span"); price.className = "price"; price.textContent = product.price ? `${product.price.toLocaleString("ru-RU")} ₽` : "Цена не указана";
+          const stock = document.createElement("span"); stock.className = "stock"; stock.textContent = isPurchase ? `К закупке: ${product.requested}` : `${product.stock} шт. в наличии`;
+          info.append(price, stock); card.append(name, info);
+          if (!isPurchase) {
+            const added = state.purchase.some(item => item.product.name === product.name);
+            const add = makeButton(added ? "Добавлено в закупку ✓" : "＋ В список закупки", () => {
+              const existing = state.purchase.find(item => item.product.name === product.name);
+              if (existing) state.purchaseMode = true;
+              else state.purchase.push({ product, quantity: 1 });
+              render();
+            }, `add-button${added ? " added" : ""}`);
+            card.append(add);
+          } else {
+            const controls = document.createElement("div"); controls.className = "qty-controls";
+            const item = state.purchase.find(entry => entry.product.name === product.name);
+            const minus = makeButton("−", () => { item.quantity = Math.max(1, item.quantity - 1); render(); }, "qty-button");
+            const amount = document.createElement("span"); amount.className = "qty-value"; amount.textContent = String(product.requested);
+            const plus = makeButton("＋", () => { item.quantity += 1; render(); }, "qty-button");
+            const remove = makeButton("Убрать", () => { state.purchase = state.purchase.filter(entry => entry.product.name !== product.name); render(); }, "remove-button");
+            controls.append(minus, amount, plus, remove); card.append(controls);
+          }
+          productsEl.append(card);
+        });
+      if (!products.length && (showProducts || isPurchase || isSearch)) {
+          const empty = document.createElement("div"); empty.className = "empty"; empty.textContent = isPurchase ? "Пока ничего не добавлено" : "Ничего не найдено";
+          productsEl.append(empty);
+        }
+      } else {
+        productsEl.hidden = true;
+      }
+
+      const badge = document.getElementById("purchase-count");
+      badge.hidden = !state.purchase.length;
+      badge.textContent = state.purchase.length;
+      document.getElementById("stock-tab").classList.toggle("active", !isPurchase);
+      document.getElementById("purchase-tab").classList.toggle("active", isPurchase);
+    }
+
+    document.getElementById("search").addEventListener("input", event => {
+      state.search = event.target.value;
+      state.purchaseMode = false;
+      render();
+    });
+
+    async function loadLiveInventory() {
+      if (!tg) return;
+      if (!tg.initData) {
+        inventory = showDemo ? demoInventory : {};
+        inventoryStatus = showDemo ? "demo" : "error";
+        render();
+        return;
+      }
+      try {
+        const response = await fetch("/api/stock", {
+          headers: { Authorization: `tma ${tg.initData}` },
+          cache: "no-store"
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        inventory = convertStockTree(await response.json());
+        inventoryStatus = "live";
+      } catch (error) {
+        console.error("Live stock loading failed", error);
+        inventory = {};
+        inventoryStatus = "error";
+      }
+      render();
+    }
+    loadLiveInventory();
+    document.getElementById("stock-tab").addEventListener("click", () => {
+      state.purchaseMode = false; state.path = []; document.getElementById("search").value = ""; state.search = ""; render();
+    });
+    document.getElementById("purchase-tab").addEventListener("click", () => { state.purchaseMode = true; state.search = ""; render(); });
+    render();
+  </script>
+</body>
+</html>

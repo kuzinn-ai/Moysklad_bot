@@ -3,6 +3,7 @@ FROM python:3.9-alpine3.17
 COPY requirements.txt /temp/requirements.txt
 
 COPY main /main
+COPY miniapp /miniapp
 
 WORKDIR /main
 
