@@ -17,9 +17,8 @@ from urllib.parse import parse_qsl, urlsplit
 from aiohttp import web
 import requests
 
-from settings import OFFLINE_TEST_MODE, token_tg, users
-
 try:
+    from .settings import OFFLINE_TEST_MODE, token_tg, users
     from .blocking_tasks import BoundedExecutor, ExecutorBusyError, run_blocking_task
     from .main import MoySkladAPIError, StockSalesReport, give_dates_ago
     from .abc_xyz import fetch_analysis, three_complete_months
@@ -41,6 +40,7 @@ try:
         recover_order_transactions,
     )
 except ImportError:
+    from settings import OFFLINE_TEST_MODE, token_tg, users
     from blocking_tasks import BoundedExecutor, ExecutorBusyError, run_blocking_task
     from main import MoySkladAPIError, StockSalesReport, give_dates_ago
     from abc_xyz import fetch_analysis, three_complete_months

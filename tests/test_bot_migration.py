@@ -3,10 +3,10 @@ from datetime import datetime, timezone
 from types import SimpleNamespace
 from unittest.mock import AsyncMock
 
-import bot
+from main import bot
 import pytest
 from aiogram.types import CallbackQuery, Chat, Message, Update, User
-from keyboard import (
+from main.keyboard import (
     get_sale_menu_keyboard,
     get_stock_menu_keyboard,
     get_stock_submenu_keyboard,

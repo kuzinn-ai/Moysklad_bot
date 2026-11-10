@@ -6,22 +6,25 @@ from aiogram import Bot, Dispatcher, F, types
 from aiogram.filters import CommandStart
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 
-from keyboard import (
-    get_sale_menu_keyboard,
-    get_stock_menu_keyboard,
-    get_stock_submenu_keyboard,
-    find_stock_node,
-    find_stock_path,
-    stock_folder_callback,
-    stock_goods_callback,
-    stock_back_callback,
-)
-from main import StockSalesReport, give_dates_ago, short_product_name, stock_result_message
-from settings import token_tg, users
-from miniapp_server import start_miniapp_server, stop_miniapp_server
 try:
+    from .keyboard import (
+        get_sale_menu_keyboard, get_stock_menu_keyboard, get_stock_submenu_keyboard,
+        find_stock_node, find_stock_path, stock_folder_callback, stock_goods_callback,
+        stock_back_callback,
+    )
+    from .main import StockSalesReport, give_dates_ago, short_product_name, stock_result_message
+    from .settings import token_tg, users
+    from .miniapp_server import start_miniapp_server, stop_miniapp_server
     from .blocking_tasks import ExecutorBusyError, run_blocking_task
 except ImportError:
+    from keyboard import (
+        get_sale_menu_keyboard, get_stock_menu_keyboard, get_stock_submenu_keyboard,
+        find_stock_node, find_stock_path, stock_folder_callback, stock_goods_callback,
+        stock_back_callback,
+    )
+    from main import StockSalesReport, give_dates_ago, short_product_name, stock_result_message
+    from settings import token_tg, users
+    from miniapp_server import start_miniapp_server, stop_miniapp_server
     from blocking_tasks import ExecutorBusyError, run_blocking_task
 
 bot = Bot(token=token_tg)
