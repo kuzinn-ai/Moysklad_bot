@@ -3,6 +3,9 @@
 import os
 
 
+OFFLINE_TEST_MODE = os.getenv("PARADISE_OFFLINE_TEST_MODE") == "1"
+
+
 try:
     try:
         from .config import token_ms, token_tg, users
@@ -15,7 +18,10 @@ except ImportError:
     raw_users = os.getenv("TELEGRAM_USER_IDS", "")
     users = [int(value.strip()) for value in raw_users.split(",") if value.strip()]
 
-if not token_ms or not token_tg:
+if OFFLINE_TEST_MODE and token_ms:
+    raise RuntimeError("В тестовом режиме удалите токен МоегоСклада из окружения и config.py.")
+
+if not token_tg or (not OFFLINE_TEST_MODE and not token_ms):
     raise RuntimeError(
         "Не найдены токены. Создайте main/config.py для PyCharm или задайте "
         "MOYSKLAD_TOKEN и TELEGRAM_BOT_TOKEN в переменных окружения."

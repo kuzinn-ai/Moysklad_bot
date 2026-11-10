@@ -7,9 +7,11 @@ import time
 import requests
 
 try:
-    from .settings import token_ms
+    from .settings import OFFLINE_TEST_MODE, token_ms
+    from . import offline_test_data
 except ImportError:
-    from settings import token_ms
+    from settings import OFFLINE_TEST_MODE, token_ms
+    import offline_test_data
 
 
 # Bound the time each synchronous MoySklad request can occupy a worker.
@@ -91,6 +93,8 @@ class StockSalesReport:
 
     def _get(self, url: str, **kwargs):
         """Make a non-redirecting request so Authorization cannot follow redirects."""
+        if OFFLINE_TEST_MODE:
+            raise RuntimeError("Тестовый режим запрещает запросы к МоемуСкладу.")
         timeout = kwargs.pop("timeout", MOYSKLAD_TIMEOUT)
         response = requests.get(
             url=url,
@@ -171,6 +175,9 @@ class StockSalesReport:
 
     def get_goods_dict(self) -> dict:
         """Build a hierarchy containing only goods with stock in the selected store."""
+        if OFFLINE_TEST_MODE:
+            mode = self.filter.rsplit("stockMode=", 1)[-1]
+            return offline_test_data.stock_tree(mode)
         filter_url = urlencode({"filter": f"{self.filter}"})
         stock_url = f"{self.stock_url_without_filter}?{filter_url}"
         try:
@@ -229,6 +236,8 @@ class StockSalesReport:
 
     def get_zero_stock_goods_dict(self) -> dict | None:
         """Find active catalog goods absent from this store's nonzero stock report."""
+        if OFFLINE_TEST_MODE:
+            return offline_test_data.stock_tree("zero")
         stock_tree = self.get_goods_dict()
         if stock_tree is None:
             return None
@@ -320,6 +329,8 @@ class StockSalesReport:
         return None
 
     def _latest_supply_price(self, product_href: str):
+        if OFFLINE_TEST_MODE:
+            return offline_test_data.latest_supply_price(product_href)
         """Return the price from the latest applicable receipt containing this product."""
         if not product_href:
             return None
@@ -380,6 +391,8 @@ class StockSalesReport:
 
     def get_popular_goods(self, top_limit: int = 5) -> list:
         """Return up to ``top_limit`` best sellers for each purchase category."""
+        if OFFLINE_TEST_MODE:
+            return offline_test_data.purchase_goods(top_limit)
         url = "https://api.moysklad.ru/api/remap/1.2/entity/retaildemand"
         sales_filter = (
             f"retailStore={self.retail_store_href};"
@@ -592,6 +605,8 @@ class StockSalesReport:
             raise
 
     def get_sales_turnover_outcome_report(self) -> str:
+        if OFFLINE_TEST_MODE:
+            return offline_test_data.sales_report(self.moment_from, self.moment_to)
         sales = self.get_sales()
         turnover_outcome = self.get_turnover_outcome()
         if not isinstance(turnover_outcome, dict):

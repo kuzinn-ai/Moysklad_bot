@@ -17,12 +17,13 @@ from urllib.parse import parse_qsl, urlsplit
 from aiohttp import web
 import requests
 
-from settings import token_tg, users
+from settings import OFFLINE_TEST_MODE, token_tg, users
 
 try:
     from .blocking_tasks import BoundedExecutor, ExecutorBusyError, run_blocking_task
     from .main import MoySkladAPIError, StockSalesReport, give_dates_ago
     from .abc_xyz import fetch_analysis, three_complete_months
+    from . import offline_test_data
     from .abc_xyz_export import build_abc_xyz_xlsx
     from .order_storage import (
         OrderNotFoundError,
@@ -43,6 +44,7 @@ except ImportError:
     from blocking_tasks import BoundedExecutor, ExecutorBusyError, run_blocking_task
     from main import MoySkladAPIError, StockSalesReport, give_dates_ago
     from abc_xyz import fetch_analysis, three_complete_months
+    import offline_test_data
     from abc_xyz_export import build_abc_xyz_xlsx
     from order_storage import (
         OrderNotFoundError,
@@ -68,7 +70,9 @@ CUSTOMER_ORDERS_DB = Path(os.getenv(
     str(Path(__file__).resolve().parent / "customer_orders.sqlite3"),
 ))
 CUSTOMER_ORDER_PHOTOS = CUSTOMER_ORDERS_DB.parent / "customer_order_photos"
-ABC_XYZ_SNAPSHOT = CUSTOMER_ORDERS_DB.parent / "abc_xyz_snapshot.json"
+ABC_XYZ_SNAPSHOT = CUSTOMER_ORDERS_DB.parent / (
+    "abc_xyz_offline_snapshot.json" if OFFLINE_TEST_MODE else "abc_xyz_snapshot.json"
+)
 ABC_XYZ_TASK = None
 ABC_XYZ_TASK_PERIOD = None
 MAX_INIT_DATA_AGE_SECONDS = 60 * 60
@@ -586,7 +590,7 @@ def _stored_abc_xyz():
 
 
 def _calculate_and_store_abc_xyz(start, end):
-    data = fetch_analysis(StockSalesReport(), start, end)
+    data = offline_test_data.analysis(start, end) if OFFLINE_TEST_MODE else fetch_analysis(StockSalesReport(), start, end)
     data["calculated_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
     ABC_XYZ_SNAPSHOT.parent.mkdir(parents=True, exist_ok=True)
     descriptor, temporary = tempfile.mkstemp(prefix=".abc_xyz_", dir=ABC_XYZ_SNAPSHOT.parent)
