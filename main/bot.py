@@ -2,9 +2,9 @@ import asyncio
 import os
 from datetime import datetime, timezone
 
-from aiogram import Bot, Dispatcher, types, executor
-from aiogram.dispatcher.filters import Text
-from aiogram.types import ReplyKeyboardMarkup, InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
+from aiogram import Bot, Dispatcher, F, types
+from aiogram.filters import CommandStart
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 
 from keyboard import (
     get_sale_menu_keyboard,
@@ -25,19 +25,19 @@ except ImportError:
     from blocking_tasks import ExecutorBusyError, run_blocking_task
 
 bot = Bot(token=token_tg)
-dp = Dispatcher(bot)
+dp = Dispatcher()
 miniapp_url = os.getenv("MINIAPP_URL", "").strip()
 if miniapp_url and not miniapp_url.startswith("https://"):
     miniapp_url = ""
 miniapp_runner = None
 
 
-async def on_startup(dispatcher: Dispatcher) -> None:
+async def on_startup(bot: Bot) -> None:
     global miniapp_runner
     miniapp_runner = await start_miniapp_server()
 
 
-async def on_shutdown(dispatcher: Dispatcher) -> None:
+async def on_shutdown(bot: Bot) -> None:
     await stop_miniapp_server(miniapp_runner)
 
 
@@ -56,25 +56,30 @@ async def send_text_in_parts(message: types.Message, text: str) -> None:
         await message.answer(chunk)
         await asyncio.sleep(1.1)
 
-@dp.message_handler(commands='start')
+@dp.message(CommandStart())
 async def start(message: types.Message) -> None:
     if message.from_user.id in users:
-        start_buttons = ['Остатки', "Продажи"]
-        keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-        keyboard.add(*start_buttons)
+        keyboard = ReplyKeyboardMarkup(
+            keyboard=[[
+                KeyboardButton(text="Остатки"),
+                KeyboardButton(text="Продажи"),
+            ]],
+            resize_keyboard=True,
+        )
         await message.answer("Привет! Чем помочь?", reply_markup=keyboard)
         if miniapp_url:
-            app_keyboard = InlineKeyboardMarkup()
-            app_keyboard.add(InlineKeyboardButton(
-                text="Открыть мини-приложение",
-                web_app=WebAppInfo(url=miniapp_url),
-            ))
+            app_keyboard = InlineKeyboardMarkup(inline_keyboard=[[
+                InlineKeyboardButton(
+                    text="Открыть мини-приложение",
+                    web_app=WebAppInfo(url=miniapp_url),
+                ),
+            ]])
             await message.answer("Новый интерфейс остатков:", reply_markup=app_keyboard)
     else:
         await message.answer("Извините, но у вас нет доступа к боту.")
 
 
-@dp.message_handler(Text(equals='Остатки'))
+@dp.message(F.text == 'Остатки')
 async def stock_menu(message: types.Message) -> None:
     if message.from_user.id in users:
         try:
@@ -92,7 +97,7 @@ async def stock_menu(message: types.Message) -> None:
         await message.answer("Извините, но у вас нет доступа к боту.")
 
 
-@dp.callback_query_handler(lambda callback_query: callback_query.data.startswith('stock_'))
+@dp.callback_query(F.data.startswith('stock_'))
 async def inline_keyboard_stock_buttons(callback: types.CallbackQuery) -> None:
     if callback.from_user.id not in users:
         await callback.answer("Извините, у вас нет доступа.")
@@ -239,7 +244,7 @@ def format_stock_tree(stock_tree: dict) -> str:
     return "\n".join(lines)
 
 
-@dp.message_handler(Text(equals='Продажи'))
+@dp.message(F.text == 'Продажи')
 async def sale_menu(message:types.Message) -> None:
     if message.from_user.id in users:
         sale_menu_keyboard = get_sale_menu_keyboard()
@@ -259,7 +264,7 @@ async def build_sales_report(report: StockSalesReport):
         return None, "error"
 
 
-@dp.callback_query_handler(lambda callback_query: callback_query.data.startswith('sales_'))
+@dp.callback_query(F.data.startswith('sales_'))
 async def inline_keyboard_sales_buttons(callback:types.CallbackQuery) -> None:
     if callback.from_user.id not in users:
         await callback.answer("Извините, у вас нет доступа.")
@@ -338,5 +343,13 @@ async def inline_keyboard_sales_buttons(callback:types.CallbackQuery) -> None:
 
     await send_text_in_parts(callback.message, result)
 
+dp.startup.register(on_startup)
+dp.shutdown.register(on_shutdown)
+
+
+async def main() -> None:
+    await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
+
+
 if __name__ == '__main__':
-    executor.start_polling(dispatcher=dp, on_startup=on_startup, on_shutdown=on_shutdown)
+    asyncio.run(main())

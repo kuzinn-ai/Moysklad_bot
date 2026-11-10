@@ -3,7 +3,25 @@
 from datetime import date, datetime, timedelta
 from decimal import Decimal, InvalidOperation
 from math import sqrt
+import time
 from urllib.parse import urlencode, urlsplit
+
+import requests
+
+
+ANALYSIS_TIMEOUT = (5, 60)
+ANALYSIS_READ_RETRIES = 2
+
+
+def _get_analysis_page(report, url, **kwargs):
+    """Retry a slow read without repeating the entire multi-page analysis."""
+    for attempt in range(ANALYSIS_READ_RETRIES + 1):
+        try:
+            return report._get(url, timeout=ANALYSIS_TIMEOUT, **kwargs)
+        except requests.exceptions.ReadTimeout:
+            if attempt == ANALYSIS_READ_RETRIES:
+                raise
+            time.sleep(attempt + 1)
 
 
 def three_complete_months(today: date) -> tuple[date, date]:
@@ -123,7 +141,7 @@ def fetch_analysis(report, start: date, end: date) -> dict:
         url = f"{base_url}?{urlencode(params)}"
         visited = {url}
         while url:
-            response = report._get(url)
+            response = _get_analysis_page(report, url)
             response.raise_for_status()
             page = report._json_page(response)
             yield page
@@ -151,7 +169,7 @@ def fetch_analysis(report, start: date, end: date) -> dict:
                     position_visited = set()
                     position_url = report._next_page(positions, position_path, position_visited)
                     while position_url:
-                        response = report._get(position_url, params={"expand": "assortment"})
+                        response = _get_analysis_page(report, position_url, params={"expand": "assortment"})
                         response.raise_for_status()
                         position_page = report._json_page(response)
                         positions["rows"].extend(position_page["rows"])

@@ -91,10 +91,11 @@ class StockSalesReport:
 
     def _get(self, url: str, **kwargs):
         """Make a non-redirecting request so Authorization cannot follow redirects."""
+        timeout = kwargs.pop("timeout", MOYSKLAD_TIMEOUT)
         response = requests.get(
             url=url,
             headers=self.headers,
-            timeout=MOYSKLAD_TIMEOUT,
+            timeout=timeout,
             allow_redirects=False,
             **kwargs,
         )

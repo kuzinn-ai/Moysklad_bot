@@ -1,6 +1,7 @@
 from hashlib import sha1
 
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
 def _path_key(path: tuple) -> str:
@@ -49,48 +50,54 @@ def find_stock_path(stock_tree: dict, callback_data: str, callback_builder):
     return walk(stock_tree)
 
 
-def _folder_button(keyboard: InlineKeyboardMarkup, name: str, path: tuple) -> None:
-    keyboard.insert(InlineKeyboardButton(text=name, callback_data=stock_folder_callback(path)))
+def _folder_button(keyboard: InlineKeyboardBuilder, name: str, path: tuple) -> None:
+    keyboard.row(InlineKeyboardButton(text=name, callback_data=stock_folder_callback(path)))
 
 
 def get_stock_menu_keyboard(stock_tree: dict) -> InlineKeyboardMarkup:
     # One button per row keeps long group names readable on Telegram.
-    keyboard = InlineKeyboardMarkup(row_width=1)
-    keyboard.insert(InlineKeyboardButton(text="Все остатки", callback_data="stock_all_stock_button"))
+    keyboard = InlineKeyboardBuilder()
+    keyboard.row(InlineKeyboardButton(text="Все остатки", callback_data="stock_all_stock_button"))
     for name in sorted(stock_tree, key=str.casefold):
         _folder_button(keyboard, name, (name,))
-    return keyboard
+    return keyboard.as_markup()
 
 
 def get_stock_submenu_keyboard(stock_tree: dict, path: tuple) -> InlineKeyboardMarkup:
     node = find_stock_node(stock_tree, path)
-    keyboard = InlineKeyboardMarkup(row_width=1)
+    keyboard = InlineKeyboardBuilder()
     if node is None:
-        return keyboard
+        return keyboard.as_markup()
 
     for name in sorted(node["_children"], key=str.casefold):
         _folder_button(keyboard, name, path + (name,))
 
     if node["_goods"] and node["_children"]:
-        keyboard.insert(InlineKeyboardButton(
+        keyboard.row(InlineKeyboardButton(
             text=f"Товары группы «{path[-1]}»",
             callback_data=stock_goods_callback(path),
         ))
 
     parent_path = path[:-1]
-    keyboard.insert(InlineKeyboardButton(
+    keyboard.row(InlineKeyboardButton(
         text="⬅️ Назад",
         callback_data=stock_back_callback(parent_path),
     ))
-    return keyboard
+    return keyboard.as_markup()
 
 
 def get_sale_menu_keyboard() -> InlineKeyboardMarkup:
-    sale_menu_keyboard = InlineKeyboardMarkup(row_width=2)
-    sale_menu_keyboard.insert(InlineKeyboardButton(text="Сегодня", callback_data="sales_today"))
-    sale_menu_keyboard.insert(InlineKeyboardButton(text="Вчера", callback_data="sales_yesterday"))
-    sale_menu_keyboard.insert(InlineKeyboardButton(text="Позавчера", callback_data="sales_before_yesterday"))
-    sale_menu_keyboard.insert(InlineKeyboardButton(text="За эту неделю", callback_data="sales_this_week"))
-    sale_menu_keyboard.insert(InlineKeyboardButton(text="За этот месяц", callback_data="sales_this_month"))
-    sale_menu_keyboard.insert(InlineKeyboardButton(text="За прошлый месяц", callback_data="sales_month_before"))
-    return sale_menu_keyboard
+    sale_menu_keyboard = InlineKeyboardBuilder()
+    sale_menu_keyboard.row(
+        InlineKeyboardButton(text="Сегодня", callback_data="sales_today"),
+        InlineKeyboardButton(text="Вчера", callback_data="sales_yesterday"),
+    )
+    sale_menu_keyboard.row(
+        InlineKeyboardButton(text="Позавчера", callback_data="sales_before_yesterday"),
+        InlineKeyboardButton(text="За эту неделю", callback_data="sales_this_week"),
+    )
+    sale_menu_keyboard.row(
+        InlineKeyboardButton(text="За этот месяц", callback_data="sales_this_month"),
+        InlineKeyboardButton(text="За прошлый месяц", callback_data="sales_month_before"),
+    )
+    return sale_menu_keyboard.as_markup()

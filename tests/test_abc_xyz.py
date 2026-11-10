@@ -11,9 +11,10 @@ from io import BytesIO
 from zipfile import ZipFile
 from xml.etree import ElementTree as ET
 import pytest
+import requests
 from aiohttp import web
 
-from main.abc_xyz import calculate_analysis, three_complete_months
+from main.abc_xyz import _get_analysis_page, calculate_analysis, three_complete_months
 from main.abc_xyz_export import build_abc_xyz_xlsx
 
 
@@ -30,6 +31,23 @@ def document(moment, product, quantity, price, discount=0):
 def test_three_complete_months_crosses_year_boundary():
     assert three_complete_months(date(2026, 1, 15)) == (date(2025, 10, 1), date(2026, 1, 1))
     assert three_complete_months(date(2026, 11, 5)) == (date(2026, 8, 1), date(2026, 11, 1))
+
+
+def test_analysis_retries_slow_page_without_restarting_other_pages(monkeypatch):
+    calls = []
+    expected = object()
+
+    class Report:
+        def _get(self, url, **kwargs):
+            calls.append((url, kwargs))
+            if len(calls) < 3:
+                raise requests.exceptions.ReadTimeout("slow page")
+            return expected
+
+    monkeypatch.setattr("main.abc_xyz.time.sleep", lambda seconds: None)
+    assert _get_analysis_page(Report(), "https://api.moysklad.ru/page") is expected
+    assert len(calls) == 3
+    assert all(kwargs["timeout"] == (5, 60) for _, kwargs in calls)
 
 
 def test_returns_reduce_revenue_and_units_while_sparse_seller_is_classified():
