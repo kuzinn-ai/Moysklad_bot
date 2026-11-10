@@ -21,6 +21,7 @@
       --shadow: 0 5px 18px rgba(25, 45, 65, .06);
     }
     * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
     body {
       margin: 0;
       background: var(--bg);
@@ -34,16 +35,25 @@
     .brand { font-size: 13px; font-weight: 700; letter-spacing: .12em; color: var(--muted); text-transform: uppercase; }
     .store { margin-top: 2px; font-size: 24px; font-weight: 750; letter-spacing: -.04em; }
     .store-chip { background: var(--green-soft); color: var(--green); border-radius: 20px; padding: 7px 11px; font-size: 12px; font-weight: 700; }
-    main { padding: 0 16px; max-width: 680px; margin: 0 auto; }
+    main { padding: 0 16px; max-width: 680px; margin: 0 auto; touch-action: pan-y; }
     .searchbox { position: sticky; top: 0; z-index: 3; padding: 4px 0 12px; background: var(--bg); }
     .search { width: 100%; height: 48px; border: 1px solid var(--line); border-radius: 15px; background: var(--card); padding: 0 15px 0 43px; color: var(--text); outline: none; box-shadow: var(--shadow); }
     .search:focus { border-color: var(--accent); }
     .search-icon { position: absolute; left: 15px; top: 17px; color: var(--muted); font-size: 19px; pointer-events: none; }
+    .stock-filters { display: flex; gap: 7px; margin: 0 0 14px; }
+    .stock-filter { flex: 1; min-width: 0; min-height: 38px; padding: 5px; border: 1px solid var(--line); border-radius: 11px; background: var(--card); color: var(--muted); font-size: 13px; font-weight: 650; cursor: pointer; }
+    .stock-filter.active { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+    .stock.zero { color: var(--muted); background: var(--bg); }
+    .stock.negative { color: #b73429; background: #fdecea; }
     .heading { display: flex; justify-content: space-between; align-items: end; margin: 8px 2px 12px; }
+    .heading-main { display: flex; align-items: center; gap: 9px; min-width: 0; }
+    .back-button { flex: none; min-height: 36px; padding: 0 10px; border: 1px solid var(--line); border-radius: 11px; background: var(--card); color: var(--accent); font-size: 14px; font-weight: 650; cursor: pointer; }
+    .back-button:disabled { color: var(--muted); opacity: .55; cursor: default; }
     h1 { font-size: 21px; line-height: 1.2; margin: 0; letter-spacing: -.03em; }
     .subheading { margin-top: 4px; color: var(--muted); font-size: 13px; }
     .count { color: var(--muted); font-size: 13px; white-space: nowrap; }
     .crumbs { display: flex; align-items: center; gap: 7px; overflow-x: auto; white-space: nowrap; margin: 0 0 12px; color: var(--muted); font-size: 13px; scrollbar-width: none; }
+    .crumbs[hidden] { display: none; }
     .crumbs button { border: 0; padding: 0; background: none; color: var(--accent); cursor: pointer; }
     .group-list, .product-list { display: grid; gap: 9px; }
     .group-card { border: 1px solid var(--line); border-radius: 17px; background: var(--card); padding: 15px; display: flex; align-items: center; gap: 13px; text-align: left; width: 100%; box-shadow: var(--shadow); cursor: pointer; color: inherit; }
@@ -52,17 +62,100 @@
     .group-name { display: block; font-weight: 700; }
     .group-meta { display: block; color: var(--muted); font-size: 13px; margin-top: 3px; }
     .chevron { color: #9aa6b2; font-size: 20px; }
-    .product-card { background: var(--card); border: 1px solid var(--line); border-radius: 17px; padding: 15px; box-shadow: var(--shadow); }
-    .product-name { font-weight: 650; line-height: 1.35; }
+    .product-card { background: var(--card); border: 1px solid var(--line); border-radius: 17px; padding: 15px; box-shadow: var(--shadow); display: flex; flex-direction: column; }
+    .product-name { font-weight: 650; line-height: 1.35; min-height: 2.7em; }
     .product-info { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 11px 0 13px; }
     .price { font-weight: 750; font-size: 18px; }
     .stock { color: var(--green); background: var(--green-soft); border-radius: 20px; padding: 5px 9px; font-weight: 700; font-size: 12px; white-space: nowrap; }
-    .add-button { width: 100%; min-height: 42px; border: 0; border-radius: 12px; background: var(--accent); color: white; font-weight: 700; cursor: pointer; }
+    .add-button { width: 100%; min-height: 42px; margin-top: auto; border: 0; border-radius: 12px; background: var(--accent); color: white; font-weight: 700; cursor: pointer; }
     .add-button.added { color: var(--green); background: var(--green-soft); }
-    .qty-controls { display: flex; align-items: center; gap: 8px; }
+    .qty-controls { display: flex; align-items: center; gap: 8px; margin-top: auto; }
     .qty-button { width: 42px; height: 40px; border: 0; border-radius: 11px; background: var(--accent-soft); color: var(--accent); font-size: 20px; font-weight: 700; cursor: pointer; }
     .qty-value { min-width: 24px; text-align: center; font-weight: 750; }
+    .qty-label { color: var(--muted); font-size: 14px; }
+    .qty-input { width: 100px; height: 40px; border: 1px solid var(--line); border-radius: 11px; background: var(--card); color: var(--text); padding: 0 10px; }
     .remove-button { margin-left: auto; border: 0; background: transparent; color: #c0392b; font-weight: 650; cursor: pointer; }
+    .purchase-summary { margin: 4px 0 18px; padding: 15px; border: 1px solid var(--line); border-radius: 16px; background: var(--card); box-shadow: var(--shadow); }
+    .purchase-view-tabs { display: flex; justify-content: flex-end; gap: 7px; margin: 5px 0 14px; }
+    .purchase-view-tab { min-height: 40px; padding: 0 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); color: var(--muted); font-weight: 650; cursor: pointer; }
+    .purchase-view-tab.active { border-color: transparent; background: var(--accent-soft); color: var(--accent); }
+    .analysis-panel { display: grid; gap: 12px; }
+    .analysis-toolbar, .analysis-card { padding: 15px; border: 1px solid var(--line); border-radius: 16px; background: var(--card); box-shadow: var(--shadow); }
+    .analysis-toolbar { display: grid; gap: 9px; }
+    .analysis-controls { display: flex; gap: 8px; }
+    .analysis-controls input, .analysis-controls select { min-width: 0; flex: 1; min-height: 40px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--text); padding: 6px 9px; }
+    .analysis-dates { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .analysis-dates label { display: grid; min-width: 0; gap: 4px; color: var(--muted); font-size: 13px; }
+    .analysis-dates input { box-sizing: border-box; width: 100%; min-width: 0; max-width: 100%; min-height: 36px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--text); padding: 4px 8px; font-size: 14px; overflow: hidden; }
+    .analysis-dates input::-webkit-date-and-time-value { min-width: 0; }
+    .analysis-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .analysis-actions button { flex: 1 1 130px; }
+    .analysis-card-head { display: flex; justify-content: space-between; gap: 10px; font-weight: 700; }
+    .analysis-class { color: var(--accent); white-space: nowrap; }
+    .analysis-update { min-height: 40px; border: 0; border-radius: 10px; background: var(--accent); color: white; font-weight: 700; }
+    .orders-panel { display: grid; gap: 12px; }
+    .order-form, .customer-order { padding: 15px; border: 1px solid var(--line); border-radius: 16px; background: var(--card); box-shadow: var(--shadow); }
+    .order-form { display: grid; gap: 10px; }
+    .order-form-title { font-size: 17px; font-weight: 750; }
+    .order-field { width: 100%; min-height: 42px; border: 1px solid var(--line); border-radius: 11px; padding: 9px 11px; background: var(--bg); color: var(--text); }
+    .order-field[type="number"] { appearance: textfield; -moz-appearance: textfield; }
+    .order-field[type="number"]::-webkit-inner-spin-button, .order-field[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    .order-field-note { min-height: 76px; resize: vertical; }
+    .order-submit { min-height: 44px; border: 0; border-radius: 12px; background: var(--accent); color: white; font-weight: 700; cursor: pointer; }
+    .customer-orders-list { display: grid; gap: 9px; }
+    .customer-order-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+    .customer-order-name { font-weight: 750; overflow-wrap: anywhere; }
+    .customer-order-date, .customer-order-meta { color: var(--muted); font-size: 13px; margin-top: 5px; }
+    .customer-order-note { margin-top: 8px; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .customer-order-photo { display: block; max-width: 100%; max-height: 280px; margin-top: 10px; border-radius: 12px; object-fit: contain; }
+    .customer-order-actions { display: flex; gap: 8px; margin-top: 11px; }
+    .customer-order-actions button { min-height: 36px; padding: 6px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--text); font-weight: 650; cursor: pointer; }
+    .customer-order-actions .order-delete { margin-left: auto; color: #c0392b; }
+    .orders-empty { padding: 18px; border-radius: 14px; background: var(--card); color: var(--muted); text-align: center; }
+    .budget-row { display: grid; grid-template-columns: 1fr minmax(110px, 150px); align-items: center; gap: 10px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+    .budget-label { font-weight: 650; }
+    .budget-input, .purchase-price-input { width: 100%; min-height: 40px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 11px; background: var(--bg); color: var(--text); }
+    .budget-input::-webkit-inner-spin-button, .budget-input::-webkit-outer-spin-button,
+    .purchase-price-input::-webkit-inner-spin-button, .purchase-price-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    .budget-input, .purchase-price-input { appearance: textfield; -moz-appearance: textfield; }
+    .purchase-price-editor { display: flex; align-items: center; gap: 7px; margin-top: 8px; }
+    .purchase-price-editor label { color: var(--muted); font-size: 12px; }
+    .purchase-price-input { width: 105px; min-height: 34px; padding: 5px 8px; }
+    .budget-status { margin-top: 8px; color: var(--muted); font-size: 13px; text-align: right; }
+    .budget-status.over { color: #c0392b; font-weight: 700; }
+    .section-title { margin: 20px 2px 10px; font-size: 17px; font-weight: 750; }
+    .purchase-recommendations { display: grid; gap: 18px; }
+    .popular-category-title { margin: 0 2px 9px; font-size: 17px; font-weight: 750; }
+    .popular-category-empty { padding: 16px; border-radius: 14px; background: var(--card); color: var(--muted); }
+    .popular-category-list { display: grid; gap: 9px; }
+    .purchase-line { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
+    .purchase-line:first-child { border-top: 0; }
+    .purchase-line-copy { min-width: 0; }
+    .purchase-line-name { font-weight: 650; overflow-wrap: anywhere; }
+    .purchase-line-meta { color: var(--muted); font-size: 13px; margin-top: 3px; }
+    .purchase-line-controls { display: flex; flex: none; align-items: center; gap: 9px; }
+    .purchase-total { display: flex; justify-content: flex-end; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 15px; font-weight: 750; }
+    .purchase-pdf-button { width: 100%; min-height: 44px; margin-top: 12px; border: 0; border-radius: 12px; background: var(--accent); color: white; font-weight: 700; cursor: pointer; }
+    .purchase-pdf-button:disabled { opacity: .65; cursor: wait; }
+    .purchase-pdf-feedback { min-height: 0; margin-top: 6px; color: var(--muted); font-size: 13px; text-align: center; }
+    .purchase-clear-button { width: 100%; min-height: 44px; margin-top: 8px; border: 1px solid #c0392b; border-radius: 12px; background: var(--card); color: #c0392b; font-weight: 700; cursor: pointer; }
+    .purchase-stepper { display: inline-flex; align-items: center; gap: 5px; padding: 4px; border: 1px solid var(--line); border-radius: 14px; background: var(--bg); }
+    .stepper-button { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 10px; background: var(--accent-soft); color: var(--accent); font-size: 23px; line-height: 1; font-weight: 650; cursor: pointer; transition: transform .12s ease, background .12s ease; }
+    .stepper-button:active { transform: scale(.92); background: color-mix(in srgb, var(--accent) 18%, var(--accent-soft)); }
+    .stepper-value { min-width: 28px; text-align: center; font-weight: 750; font-variant-numeric: tabular-nums; }
+    .remove-button { padding: 6px; }
+    #purchase-period { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 6px 2px 12px; color: var(--muted); font-size: 14px; }
+    #purchase-period[hidden] { display: none; }
+    .period-picker { position: relative; }
+    .period-trigger { display: inline-flex; align-items: center; gap: 10px; min-height: 38px; padding: 6px 12px; border: 1px solid var(--line); border-radius: 13px; background: var(--card); color: var(--text); font: inherit; cursor: pointer; }
+    .period-trigger:focus-visible, .period-option:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .period-chevron { width: 8px; height: 8px; margin: -4px 2px 0 1px; border-right: 1.7px solid var(--muted); border-bottom: 1.7px solid var(--muted); transform: rotate(45deg); transition: transform .16s ease; }
+    .period-trigger[aria-expanded="true"] .period-chevron { transform: rotate(225deg); }
+    .period-menu { position: absolute; z-index: 4; top: calc(100% + 6px); left: 0; min-width: 100%; padding: 5px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); box-shadow: 0 10px 28px rgba(25, 45, 65, .16); }
+    .period-menu[hidden] { display: none; }
+    .period-option { display: block; width: 100%; padding: 9px 12px; border: 0; border-radius: 9px; background: transparent; color: var(--text); text-align: left; white-space: nowrap; font: inherit; cursor: pointer; }
+    .period-option[aria-selected="true"] { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+    .period-option:hover { background: var(--accent-soft); }
     .notice { color: var(--muted); font-size: 12px; text-align: center; padding: 18px 8px 4px; }
     .empty { color: var(--muted); padding: 30px 15px; text-align: center; background: white; border-radius: 16px; }
     .bottom-nav { position: fixed; z-index: 5; bottom: 0; left: 0; right: 0; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: rgba(255,255,255,.94); border-top: 1px solid var(--line); backdrop-filter: blur(15px); }
@@ -73,6 +166,11 @@
     @media (min-width: 540px) {
       .group-list { grid-template-columns: 1fr 1fr; }
       .product-list { grid-template-columns: 1fr 1fr; }
+      .popular-category-list { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 539px) {
+      .analysis-dates { grid-template-columns: 1fr; }
+      .analysis-dates label { width: min(100%, 260px); }
     }
   </style>
 </head>
@@ -89,13 +187,51 @@
       <span class="search-icon">⌕</span>
       <input class="search" id="search" type="search" placeholder="Найти товар" autocomplete="off" aria-label="Найти товар">
     </div>
+    <div class="stock-filters" id="stock-filters" role="group" aria-label="Фильтр по остатку">
+      <button class="stock-filter active" type="button" data-stock-mode="positive" aria-pressed="true">Плюсовые</button>
+      <button class="stock-filter" type="button" data-stock-mode="zero" aria-pressed="false">Нулевые</button>
+      <button class="stock-filter" type="button" data-stock-mode="negative" aria-pressed="false">Минусовые</button>
+    </div>
+    <div id="purchase-period" hidden>
+      <span>Популярные продажи за период</span>
+      <div class="period-picker">
+        <button class="period-trigger" id="period-trigger" type="button" aria-haspopup="listbox" aria-controls="period-menu" aria-expanded="false">
+          <span id="period-label">За неделю</span><span class="period-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="period-menu" id="period-menu" role="listbox" aria-label="Период продаж" hidden>
+          <button class="period-option" type="button" role="option" data-period="week" aria-selected="true">За неделю</button>
+          <button class="period-option" type="button" role="option" data-period="month" aria-selected="false">За месяц</button>
+        </div>
+      </div>
+    </div>
+    <div class="purchase-view-tabs" id="purchase-view-tabs" hidden>
+      <button class="purchase-view-tab" id="orders-view-tab" type="button">Заказы покупателей</button>
+      <button class="purchase-view-tab" id="analysis-view-tab" type="button">ABC‑XYZ</button>
+    </div>
     <div class="heading">
-      <div><h1 id="title">Категории</h1><div id="subtitle" class="subheading">Остатки обновляются из МоегоСклада</div></div>
+      <div class="heading-main"><button class="back-button" id="back-button" type="button" aria-label="Назад">← Назад</button><div><h1 id="title">Категории</h1><div id="subtitle" class="subheading">Остатки обновляются из МоегоСклада</div></div></div>
       <div id="count" class="count"></div>
     </div>
     <nav class="crumbs" id="crumbs" aria-label="Путь по категориям"></nav>
     <section class="group-list" id="groups"></section>
+    <section id="purchase-draft" hidden></section>
+    <div id="recommendation-title" class="section-title" hidden>Популярные продажи — можно добавить в закупку</div>
     <section class="product-list" id="products" hidden></section>
+    <section class="analysis-panel" id="analysis-panel" hidden></section>
+    <section class="orders-panel" id="customer-orders-panel" hidden>
+      <form class="order-form" id="customer-order-form">
+        <div class="order-form-title">Новый заказ покупателя</div>
+        <input class="order-field" name="product_name" maxlength="300" placeholder="Что попросили привезти? *" required>
+        <input class="order-field" name="quantity" type="number" min="1" max="999" step="1" value="1" inputmode="numeric" aria-label="Количество">
+        <input class="order-field" name="customer_name" maxlength="100" placeholder="Имя покупателя (необязательно)">
+        <input class="order-field" name="contact" maxlength="100" placeholder="Телефон или Telegram (необязательно)">
+        <textarea class="order-field order-field-note" name="note" maxlength="1000" placeholder="Вкус, модель, допустимая замена и другие детали"></textarea>
+        <input class="order-field" name="photo" type="file" accept="image/jpeg,image/png,image/webp" aria-label="Фото товара (необязательно)">
+        <button class="order-submit" type="submit">Сохранить заказ</button>
+        <div class="group-meta" id="order-form-feedback" aria-live="polite"></div>
+      </form>
+      <div class="customer-orders-list" id="customer-orders-list"></div>
+    </section>
     <div class="notice" id="notice">Макет: демонстрационные данные, подключение к МоемуСкладу ещё не настроено.</div>
   </main>
 
@@ -142,11 +278,626 @@
     tg?.ready();
     tg?.expand();
 
-    let inventory = demoInventory;
-    let inventoryStatus = "demo";
-    const state = { path: [], purchase: [], purchaseMode: false, search: "" };
+    let inventory = showDemo ? demoInventory : {};
+    const stockInventories = {};
+    let stockRequestId = 0;
+    let inventoryStatus = showDemo ? "demo" : "loading";
+    const savedPurchase = (() => {
+      try {
+        const saved = JSON.parse(localStorage.getItem("paradise-purchase-draft") || "[]");
+        return Array.isArray(saved) ? saved.filter(item => item?.product?.name && Number(item.quantity) > 0).map(item => ({
+          ...item,
+          purchasePrice: item.purchasePrice ?? item.product.buy_price ?? null,
+          purchasePriceEdited: Boolean(item.purchasePriceEdited) || (
+            item.purchasePrice != null && (
+              item.product.buy_price == null || Number(item.purchasePrice) !== Number(item.product.buy_price)
+            )
+          ),
+        })) : [];
+      } catch (_) { return []; }
+    })();
+    const savedBudget = (() => {
+      const raw = localStorage.getItem("paradise-purchase-budget");
+      const value = Number(raw);
+      return raw !== null && raw !== "" && Number.isFinite(value) && value >= 0 ? value : null;
+    })();
+    const savedAddedOrderIds = (() => {
+      try { return new Set(JSON.parse(localStorage.getItem("paradise-orders-added-to-draft") || "[]")); }
+      catch (_) { return new Set(); }
+    })();
+    function defaultAnalysisDates() {
+      const parts = Object.fromEntries(new Intl.DateTimeFormat("en-US", { timeZone: "Europe/Moscow", year: "numeric", month: "2-digit", day: "2-digit" })
+        .formatToParts(new Date()).filter(part => part.type !== "literal").map(part => [part.type, Number(part.value)]));
+      const first = new Date(Date.UTC(parts.year, parts.month - 4, 1));
+      const last = new Date(Date.UTC(parts.year, parts.month - 1, 0));
+      return { from: first.toISOString().slice(0, 10), to: last.toISOString().slice(0, 10), today: `${parts.year}-${String(parts.month).padStart(2, "0")}-${String(parts.day).padStart(2, "0")}` };
+    }
+    const defaultDates = defaultAnalysisDates();
+    const state = {
+      path: [], purchase: savedPurchase, purchaseMode: false, search: "", stockMode: "positive",
+      popularGoods: [], purchasePeriod: "week", purchaseLoading: false, purchaseError: false,
+      purchaseBudget: savedBudget, purchaseView: "popular", customerOrders: [],
+      customerOrdersLoading: false, customerOrdersError: false,
+      analysis: null, analysisLoading: false, analysisError: "", analysisClass: "all", analysisSearch: "", analysisLimit: 100,
+      analysisFrom: defaultDates.from, analysisTo: defaultDates.to, analysisExcel: null, analysisExcelLoading: false, analysisExcelError: false
+    };
+    const orderPhotoUrls = new Map();
     const groupsEl = document.getElementById("groups");
     const productsEl = document.getElementById("products");
+    const draftEl = document.getElementById("purchase-draft");
+
+    function customerOrderQuantity(item) {
+      const tracked = Object.values(item.orderContributions || {})
+        .reduce((sum, quantity) => sum + Math.max(0, Number(quantity) || 0), 0);
+      if (tracked > 0) return Math.min(item.quantity, tracked);
+      // Drafts created before order contributions were recorded still have
+      // their order IDs saved separately on this device.
+      if (item.product.stock === 0 && item.product.price == null && item.product.buy_price == null) {
+        const legacy = state.customerOrders
+          .filter(order => savedAddedOrderIds.has(order.id) && order.product_name === item.product.name)
+          .reduce((sum, order) => sum + Math.max(0, Number(order.quantity) || 0), 0);
+        return Math.min(item.quantity, legacy);
+      }
+      return 0;
+    }
+    function purchaseQuantity(item) {
+      return Math.max(0, item.quantity - customerOrderQuantity(item));
+    }
+
+    function savePurchase() {
+      try { localStorage.setItem("paradise-purchase-draft", JSON.stringify(state.purchase)); }
+      catch (error) { console.warn("Не удалось сохранить черновик на этом устройстве", error); }
+    }
+    function savePurchaseBudget() {
+      try {
+        if (state.purchaseBudget === null) localStorage.removeItem("paradise-purchase-budget");
+        else localStorage.setItem("paradise-purchase-budget", String(state.purchaseBudget));
+      } catch (error) { console.warn("Не удалось сохранить бюджет на этом устройстве", error); }
+    }
+    function apiHeaders() {
+      return tg?.initData ? { Authorization: `tma ${tg.initData}` } : {};
+    }
+    async function fetchCustomerOrdersData() {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 15000);
+      try {
+        const response = await fetch("/api/customer-orders", {
+          headers: apiHeaders(), cache: "no-store", signal: controller.signal,
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        return Array.isArray(data.items) ? data.items : [];
+      } catch (error) {
+        if (controller.signal.aborted) throw new Error("Заказы не загрузились за 15 секунд. Проверьте соединение и попробуйте ещё раз.");
+        throw error;
+      } finally {
+        clearTimeout(timeout);
+      }
+    }
+    async function loadCustomerOrders() {
+      state.customerOrdersLoading = true;
+      state.customerOrdersError = false;
+      render();
+      try {
+        state.customerOrders = await fetchCustomerOrdersData();
+      } catch (error) {
+        console.error("Не удалось загрузить заказы покупателей", error);
+        state.customerOrdersError = true;
+      } finally {
+        state.customerOrdersLoading = false;
+        render();
+      }
+    }
+    async function loadOrderPhoto(orderId, image) {
+      if (!orderPhotoUrls.has(orderId)) {
+        try {
+          const response = await fetch(`/api/customer-orders/${encodeURIComponent(orderId)}/photo?variant=pdf`, { headers: apiHeaders() });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          orderPhotoUrls.set(orderId, URL.createObjectURL(await response.blob()));
+        } catch (error) {
+          console.warn("Не удалось загрузить фото заказа", error);
+          return;
+        }
+      }
+      if (image.isConnected) image.src = orderPhotoUrls.get(orderId);
+    }
+    function fileAsDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(reader.error || new Error("Не удалось прочитать фото"));
+        reader.readAsDataURL(file);
+      });
+    }
+    function pdfText(value) {
+      // Give PDFMake safe break points in long links and words without changing what is printed.
+      return String(value || "—").replace(/\S{35,}/gu, part =>
+        [...part].reduce((pieces, character, index) =>
+          pieces + (index && index % 30 === 0 ? "\u200b" : "") + character, "")
+      );
+    }
+    async function orderPhotoForPdf(orderId) {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10000);
+      let objectUrl;
+      try {
+        const response = await fetch(`/api/customer-orders/${encodeURIComponent(orderId)}/photo?variant=pdf`, {
+          headers: apiHeaders(), signal: controller.signal,
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        objectUrl = URL.createObjectURL(await response.blob());
+        const image = new Image();
+        image.src = objectUrl;
+        await Promise.race([
+          image.decode(),
+          new Promise((_, reject) => setTimeout(() => reject(new Error("Фото не открылось вовремя")), 10000)),
+        ]);
+        const scale = Math.min(1, 900 / Math.max(image.naturalWidth, image.naturalHeight));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+        canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+        const context = canvas.getContext("2d");
+        if (!context) throw new Error("Не удалось обработать фото");
+        context.fillStyle = "#ffffff";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        return canvas.toDataURL("image/jpeg", 0.8);
+      } finally {
+        clearTimeout(timeout);
+        if (objectUrl) URL.revokeObjectURL(objectUrl);
+      }
+    }
+    function positionWord(count) {
+      const lastTwo = count % 100;
+      if (lastTwo >= 11 && lastTwo <= 14) return "позиций";
+      const last = count % 10;
+      if (last === 1) return "позиция";
+      if (last >= 2 && last <= 4) return "позиции";
+      return "позиций";
+    }
+    let pdfLibraryPromise;
+    function loadPdfLibrary() {
+      if (window.pdfMake?.createPdf) return Promise.resolve(window.pdfMake);
+      if (!pdfLibraryPromise) {
+        pdfLibraryPromise = new Promise((resolve, reject) => {
+          const loadScript = src => new Promise((scriptResolve, scriptReject) => {
+            const script = document.createElement("script");
+            script.src = src;
+            const timeout = setTimeout(() => {
+              script.onload = null;
+              script.onerror = null;
+              script.remove();
+              scriptReject(new Error("Компонент PDF не загрузился за 15 секунд. Проверьте соединение и попробуйте ещё раз."));
+            }, 15000);
+            script.onload = () => { clearTimeout(timeout); scriptResolve(); };
+            script.onerror = () => {
+              clearTimeout(timeout);
+              scriptReject(new Error("Не удалось загрузить компонент PDF. Проверьте соединение и попробуйте ещё раз."));
+            };
+            document.head.append(script);
+          });
+          loadScript("/assets/pdfmake.min.js")
+            .then(() => loadScript("/assets/vfs_fonts.js"))
+            .then(() => {
+              if (!window.pdfMake?.createPdf || !window.pdfMake.vfs?.["Roboto-Regular.ttf"]) {
+                throw new Error("Не загрузились шрифты для PDF");
+              }
+              resolve(window.pdfMake);
+            })
+            .catch(error => {
+              pdfLibraryPromise = null;
+              reject(error);
+            });
+        });
+      }
+      return pdfLibraryPromise;
+    }
+    function formatDisplayDate(date) {
+      if (Number.isNaN(date.getTime())) return "";
+      const pad = value => String(value).padStart(2, "0");
+      return `${pad(date.getDate())}-${pad(date.getMonth() + 1)}-${date.getFullYear()}`;
+    }
+    function localDateParts(date = new Date()) {
+      const pad = value => String(value).padStart(2, "0");
+      return {
+        display: formatDisplayDate(date),
+        file: `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`,
+        key: date.toLocaleDateString("ru-RU"),
+      };
+    }
+    function money(value) {
+      return `${Number(value).toLocaleString("ru-RU", { maximumFractionDigits: 2 })} ₽`;
+    }
+    function downloadPurchasePdf(file) {
+      const url = URL.createObjectURL(file);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = file.name;
+      link.hidden = true;
+      document.body.append(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    }
+    function purchasePdfKey() {
+      const linkedIds = new Set(state.purchase.flatMap(item =>
+        Object.entries(item.orderContributions || {})
+          .filter(([, quantity]) => Number(quantity) > 0)
+          .map(([orderId]) => orderId)
+      ));
+      const legacyOrderNames = new Set(state.purchase
+        .filter(item => !Object.keys(item.orderContributions || {}).length &&
+          item.product.stock === 0 && item.product.price == null && item.product.buy_price == null)
+        .map(item => item.product.name));
+      return JSON.stringify({
+        date: localDateParts().key,
+        purchase: state.purchase.map(item => [item.product.name, item.quantity, item.purchasePrice, item.orderContributions || {}]),
+        budget: state.purchaseBudget,
+        addedOrderIds: [...savedAddedOrderIds].sort(),
+        linkedOrders: state.customerOrders
+          .filter(order => linkedIds.has(order.id) ||
+            (savedAddedOrderIds.has(order.id) && legacyOrderNames.has(order.product_name)))
+          .map(order => [order.id, order.product_name, order.quantity, order.customer_name, order.contact, order.note, order.has_photo]),
+      });
+    }
+    async function buildPurchasePdf() {
+        const trackedOrderIds = new Set(state.purchase.flatMap(item =>
+          Object.entries(item.orderContributions || {})
+            .filter(([, quantity]) => Number(quantity) > 0)
+            .map(([orderId]) => orderId)
+        ));
+        const legacyOrderItems = state.purchase.filter(item =>
+          !Object.keys(item.orderContributions || {}).length &&
+          item.product.stock === 0 && item.product.price == null && item.product.buy_price == null
+        );
+        const allOrders = trackedOrderIds.size || (savedAddedOrderIds.size && legacyOrderItems.length)
+          ? await fetchCustomerOrdersData() : [];
+        const customerOrders = allOrders.filter(order =>
+          trackedOrderIds.has(order.id) || (
+            savedAddedOrderIds.has(order.id) &&
+            legacyOrderItems.some(item => item.product.name === order.product_name)
+          )
+        );
+        const pdfMake = await loadPdfLibrary();
+        const date = localDateParts();
+        const lines = state.purchase.flatMap(item => {
+          let purchaseQuantity = Math.max(0, Number(item.quantity) || 0);
+          Object.entries(item.orderContributions || {}).forEach(([, contribution]) => {
+            const orderQuantity = Math.max(0, Math.floor(Number(contribution) || 0));
+            purchaseQuantity -= Math.min(purchaseQuantity, orderQuantity);
+          });
+          customerOrders.forEach(order => {
+            if (!savedAddedOrderIds.has(order.id) || trackedOrderIds.has(order.id)) return;
+            if (!legacyOrderItems.includes(item) || order.product_name !== item.product.name) return;
+            purchaseQuantity -= Math.min(purchaseQuantity, Math.max(0, Number(order.quantity) || 0));
+          });
+          if (purchaseQuantity <= 0) return [];
+          const hasPrice = item.purchasePrice !== null && item.purchasePrice !== "" && Number.isFinite(Number(item.purchasePrice));
+          const unitPrice = hasPrice ? Number(item.purchasePrice) : null;
+          return {
+            name: String(item.product.name),
+            quantity: purchaseQuantity,
+            unitPrice,
+            amount: hasPrice ? unitPrice * purchaseQuantity : null,
+          };
+        });
+        const total = lines.reduce((sum, item) => sum + (item.amount ?? 0), 0);
+        const unpriced = lines.filter(item => item.unitPrice === null).length;
+        const rows = [[
+          { text: "Товар", style: "tableHeader" },
+          { text: "Кол-во", style: "tableHeader", alignment: "right" },
+          { text: "Цена за шт.", style: "tableHeader", alignment: "right" },
+          { text: "Сумма", style: "tableHeader", alignment: "right" },
+        ]];
+        lines.forEach(item => rows.push([
+          { text: item.name, style: "cell" },
+          { text: String(item.quantity), style: "cell", alignment: "right" },
+          { text: item.unitPrice === null ? "не указана" : money(item.unitPrice), style: "cell", alignment: "right" },
+          { text: item.amount === null ? "—" : money(item.amount), style: "cell", alignment: "right" },
+        ]));
+        const orderPhotos = await Promise.all(customerOrders.map(async order => {
+          if (!order.has_photo) return null;
+          try {
+            return await orderPhotoForPdf(order.id);
+          } catch (error) {
+            console.warn("Не удалось добавить фото заказа в PDF", order.id, error);
+            return null;
+          }
+        }));
+        const orderRows = [[{ text: "Товар и данные покупателя", style: "tableHeader" }]];
+        customerOrders.forEach((order, index) => {
+          const quantity = Math.max(0, Number(order.quantity) || 0);
+          const details = [
+            { text: pdfText(order.product_name || "Заказ покупателя"), style: "orderName" },
+            { text: `${quantity} шт.`, style: "note", margin: [0, 2, 0, 8] },
+            { text: [{ text: "Покупатель: ", bold: true }, pdfText(order.customer_name)], style: "orderDetail" },
+            { text: [{ text: "Контакт: ", bold: true }, pdfText(order.contact)], style: "orderDetail" },
+          ];
+          if (order.note) details.push({ text: [{ text: "Комментарий: ", bold: true }, pdfText(order.note)], style: "orderDetail", margin: [0, 5, 0, 0] });
+          if (!orderPhotos[index] && order.has_photo) details.push({ text: "Фото не удалось загрузить", style: "note", margin: [0, 5, 0, 0] });
+          const orderContent = orderPhotos[index] ? {
+            columns: [
+              { width: "*", stack: details },
+              { width: 145, stack: [
+                { text: "Фото товара", style: "note", margin: [0, 0, 0, 5] },
+                { image: orderPhotos[index], fit: [145, 135] },
+              ] },
+            ],
+            columnGap: 14,
+          } : { stack: details };
+          orderRows.push([{ ...orderContent, margin: [0, 2, 0, 2] }]);
+        });
+        const tableLayout = {
+          fillColor: rowIndex => rowIndex === 0 ? "#e8f4ff" : (rowIndex % 2 === 0 ? "#f7f9fb" : null),
+          hLineColor: () => "#dce3e9",
+          vLineColor: () => "#ffffff",
+          paddingLeft: () => 7, paddingRight: () => 7, paddingTop: () => 7, paddingBottom: () => 7,
+        };
+        const documentDefinition = {
+          pageSize: "A4",
+          pageMargins: [36, 42, 36, 42],
+          defaultStyle: { font: "Roboto", fontSize: 10, color: "#17212b" },
+          content: [
+            { text: "Paradise", style: "brand" },
+            { text: "Черновик закупки", style: "title" },
+            { text: `Дата: ${date.display}`, style: "meta" },
+            { text: `${lines.length} ${positionWord(lines.length)} · ${lines.reduce((sum, item) => sum + item.quantity, 0)} шт.`, style: "meta", margin: [0, 0, 0, 18] },
+            ...(lines.length ? [
+              { table: { headerRows: 1, widths: ["*", 46, 86, 82], body: rows }, layout: tableLayout },
+              { text: `Итого по указанным закупочным ценам: ${money(total)}`, style: "total", margin: [0, 18, 0, 0] },
+              ...(unpriced ? [{ text: `Без закупочной цены: ${unpriced} ${positionWord(unpriced)}. Эти товары не включены в итог.`, style: "note", margin: [0, 5, 0, 0] }] : []),
+              ...(state.purchaseBudget != null ? [{ text: `Плановый бюджет: ${money(state.purchaseBudget)}`, style: "note", margin: [0, 5, 0, 0] }] : []),
+            ] : [{ text: "В черновике закупки нет товаров.", style: "note", margin: [0, 0, 0, 12] }]),
+            ...(customerOrders.length ? [
+              { text: "Заказы покупателей", style: "sectionTitle", margin: [0, 22, 0, 8], headlineLevel: 1 },
+              { text: `Заказов: ${customerOrders.length} · Всего: ${customerOrders.reduce((sum, order) => sum + Math.max(0, Number(order.quantity) || 0), 0)} шт.`, style: "note", margin: [0, 0, 0, 8] },
+              { table: { headerRows: 1, widths: ["*"], body: orderRows, dontBreakRows: true, keepWithHeaderRows: 1 }, layout: tableLayout },
+            ] : []),
+          ],
+          styles: {
+            brand: { fontSize: 12, bold: true, color: "#21865a", characterSpacing: 1.5 },
+            title: { fontSize: 21, bold: true, margin: [0, 7, 0, 8] },
+            sectionTitle: { fontSize: 15, bold: true },
+            meta: { fontSize: 10, color: "#718096", margin: [0, 0, 0, 5] },
+            tableHeader: { bold: true, color: "#17212b" },
+            cell: { fontSize: 9 },
+            orderName: { fontSize: 11, bold: true },
+            orderDetail: { fontSize: 9, margin: [0, 0, 0, 3] },
+            total: { fontSize: 13, bold: true },
+            note: { fontSize: 9, color: "#718096" },
+          },
+        };
+        const blob = await new Promise((resolve, reject) => {
+          const timeout = setTimeout(() => reject(new Error("PDF не сформировался за 20 секунд. Попробуйте ещё раз.")), 20000);
+          try {
+            pdfMake.createPdf(documentDefinition).getBlob(result => {
+              clearTimeout(timeout);
+              resolve(result);
+            });
+          } catch (error) {
+            clearTimeout(timeout);
+            reject(error);
+          }
+        });
+        const filename = `Черновик закупки Paradise ${date.display}.pdf`;
+        return new File([blob], filename, { type: "application/pdf" });
+    }
+    let preparedPurchasePdf = null;
+    let preparingPurchasePdf = null;
+    let purchasePdfError = null;
+    function updatePurchasePdfButton() {
+      const button = draftEl.querySelector(".purchase-pdf-button");
+      const feedback = draftEl.querySelector(".purchase-pdf-feedback");
+      if (!button) return;
+      const key = purchasePdfKey();
+      if (preparedPurchasePdf?.key === key) {
+        button.disabled = false;
+        button.textContent = "Сохранить черновик в PDF";
+        if (feedback) feedback.textContent = "";
+      } else if (purchasePdfError?.key === key) {
+        button.disabled = false;
+        button.textContent = "Повторить подготовку PDF";
+        if (feedback) feedback.textContent = purchasePdfError.error.message || "Не удалось подготовить PDF.";
+      } else {
+        button.disabled = true;
+        button.textContent = "Подготавливаем PDF…";
+        if (feedback) feedback.textContent = "";
+      }
+    }
+    function preparePurchasePdf(retry = false) {
+      if (!state.purchase.length) {
+        preparedPurchasePdf = null;
+        purchasePdfError = null;
+        return;
+      }
+      const key = purchasePdfKey();
+      if (preparedPurchasePdf?.key === key || preparingPurchasePdf?.key === key) {
+        updatePurchasePdfButton();
+        return;
+      }
+      if (purchasePdfError?.key === key && !retry) {
+        updatePurchasePdfButton();
+        return;
+      }
+      if (preparingPurchasePdf) {
+        updatePurchasePdfButton();
+        return;
+      }
+      preparedPurchasePdf = null;
+      purchasePdfError = null;
+      const promise = buildPurchasePdf();
+      preparingPurchasePdf = { key, promise };
+      updatePurchasePdfButton();
+      promise.then(file => {
+        if (purchasePdfKey() === key) preparedPurchasePdf = { key, file };
+      }).catch(error => {
+        if (purchasePdfKey() === key) purchasePdfError = { key, error };
+        console.warn("Не удалось подготовить PDF черновика", error);
+      }).finally(() => {
+        if (preparingPurchasePdf?.key === key) preparingPurchasePdf = null;
+        if (purchasePdfKey() === key) updatePurchasePdfButton();
+        else preparePurchasePdf();
+      });
+    }
+    function sharePreparedPurchasePdf() {
+      const key = purchasePdfKey();
+      if (preparedPurchasePdf?.key !== key) {
+        preparePurchasePdf(true);
+        return;
+      }
+      const file = preparedPurchasePdf.file;
+      const feedback = draftEl.querySelector(".purchase-pdf-feedback");
+      if (navigator.share && navigator.canShare?.({ files: [file] })) {
+        try {
+          navigator.share({ files: [file] }).then(() => {
+            if (feedback?.isConnected) feedback.textContent = "PDF передан в меню отправки.";
+          }).catch(error => {
+            if (error.name === "AbortError") return;
+            console.warn("Не удалось открыть меню отправки PDF", error);
+            downloadPurchasePdf(file);
+            if (feedback?.isConnected) feedback.textContent = "Меню отправки не открылось. PDF доступен для сохранения.";
+          });
+        } catch (error) {
+          console.warn("Не удалось открыть меню отправки PDF", error);
+          downloadPurchasePdf(file);
+          if (feedback?.isConnected) feedback.textContent = "Меню отправки не открылось. PDF доступен для сохранения.";
+        }
+      } else {
+        downloadPurchasePdf(file);
+        if (feedback?.isConnected) feedback.textContent = "PDF сохранён на устройстве.";
+      }
+    }
+    function addToPurchase(product, amount = 1, sourceOrderId = null) {
+      const existing = state.purchase.find(item => item.product.name === product.name);
+      if (existing) {
+        const priceWasAutomatic = !existing.purchasePriceEdited && (
+          existing.purchasePrice == null || (
+            existing.product.buy_price != null &&
+            Number(existing.purchasePrice) === Number(existing.product.buy_price)
+          )
+        );
+        existing.product = { ...existing.product, ...product };
+        if (priceWasAutomatic && product.buy_price != null) {
+          existing.purchasePrice = Number(product.buy_price);
+          existing.purchasePriceEdited = false;
+        }
+        existing.quantity += amount;
+        if (sourceOrderId) {
+          existing.orderContributions = existing.orderContributions || {};
+          existing.orderContributions[sourceOrderId] = (existing.orderContributions[sourceOrderId] || 0) + amount;
+        }
+      } else {
+        state.purchase.push({
+          product,
+          quantity: amount,
+          purchasePrice: product.buy_price == null ? null : Number(product.buy_price),
+          purchasePriceEdited: false,
+          orderContributions: sourceOrderId ? { [sourceOrderId]: amount } : {},
+        });
+      }
+      const draftItem = state.purchase.find(item => item.product.name === product.name);
+      if (product.purchase_href && draftItem && !draftItem.purchasePriceEdited) {
+        draftItem.purchasePriceLoading = true;
+      }
+      savePurchase();
+    }
+
+    async function loadLatestPurchasePrice(product) {
+      if (!product.purchase_href) return;
+      const item = state.purchase.find(entry => entry.product.name === product.name);
+      if (!item || item.purchasePriceEdited) return;
+      item.purchasePriceLoading = true;
+      render();
+      try {
+        const headers = tg?.initData
+          ? { Authorization: `tma ${tg.initData}` }
+          : {};
+        const response = await fetch(
+          `/api/purchase-price?href=${encodeURIComponent(product.purchase_href)}`,
+          { headers, cache: "no-store" }
+        );
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        const current = state.purchase.find(entry => entry.product.name === product.name);
+        if (current && !current.purchasePriceEdited && data.buy_price != null) {
+          current.purchasePrice = Number(data.buy_price);
+          current.product.buy_price = Number(data.buy_price);
+        }
+      } catch (error) {
+        console.error("Не удалось получить цену последней приёмки", error);
+      } finally {
+        const current = state.purchase.find(entry => entry.product.name === product.name);
+        if (current) current.purchasePriceLoading = false;
+        savePurchase();
+        render();
+      }
+    }
+
+    function removeOrderFromPurchase(order) {
+      if (!savedAddedOrderIds.has(order.id)) return;
+      const draftItem = state.purchase.find(item => item.orderContributions?.[order.id]);
+      if (draftItem) {
+        const contributedQuantity = Number(draftItem.orderContributions[order.id]) || 0;
+        draftItem.quantity -= contributedQuantity;
+        delete draftItem.orderContributions[order.id];
+        if (draftItem.quantity <= 0) state.purchase = state.purchase.filter(item => item !== draftItem);
+      } else {
+        // Older drafts marked the order as added but did not record the
+        // contribution. Subtract only the quantity that was added from the
+        // matching line, leaving any remaining/manual quantity untouched.
+        const legacyItem = state.purchase.find(item => item.product.name === order.product_name);
+        if (legacyItem) {
+          legacyItem.quantity = Math.max(0, legacyItem.quantity - Number(order.quantity || 0));
+          if (legacyItem.quantity === 0) state.purchase = state.purchase.filter(item => item !== legacyItem);
+        }
+      }
+      savedAddedOrderIds.delete(order.id);
+      localStorage.setItem("paradise-orders-added-to-draft", JSON.stringify([...savedAddedOrderIds]));
+      savePurchase();
+    }
+
+    function clearOrderLinksForDraftItem(item) {
+      Object.keys(item.orderContributions || {}).forEach(orderId => savedAddedOrderIds.delete(orderId));
+      state.customerOrders
+        .filter(order => order.product_name === item.product.name)
+        .forEach(order => savedAddedOrderIds.delete(order.id));
+      localStorage.setItem("paradise-orders-added-to-draft", JSON.stringify([...savedAddedOrderIds]));
+    }
+
+    function clearPurchaseDraft() {
+      if (!state.purchase.length || !window.confirm("Удалить все позиции из черновика закупки? Заказы покупателей останутся.")) return;
+      state.purchase = [];
+      savedAddedOrderIds.clear();
+      localStorage.setItem("paradise-orders-added-to-draft", "[]");
+      savePurchase();
+      render();
+    }
+
+    function decrementDraftItem(item) {
+      const contributions = item.orderContributions || {};
+      const contributedTotal = Object.values(contributions).reduce((sum, amount) => sum + (Number(amount) || 0), 0);
+      if (item.quantity <= 1) {
+        clearOrderLinksForDraftItem(item);
+        state.purchase = state.purchase.filter(entry => entry !== item);
+      } else {
+        // Remove manually added units first; after those are gone, reduce the
+        // recorded contribution from the most recently added customer order.
+        if (contributedTotal >= item.quantity) {
+          const orderId = Object.keys(contributions).slice(-1)[0];
+          if (orderId) {
+            contributions[orderId] -= 1;
+            if (contributions[orderId] <= 0) {
+              delete contributions[orderId];
+              savedAddedOrderIds.delete(orderId);
+              localStorage.setItem("paradise-orders-added-to-draft", JSON.stringify([...savedAddedOrderIds]));
+            }
+          }
+        }
+        item.quantity -= 1;
+      }
+      savePurchase();
+      render();
+    }
 
     function getNode(path) {
       return path.reduce((node, part) => node?.[part], inventory);
@@ -182,6 +933,301 @@
       button.addEventListener("click", callback);
       return button;
     }
+    function navigate(path, purchaseMode = false) {
+      state.path = [...path];
+      state.purchaseMode = purchaseMode;
+      state.search = "";
+      document.getElementById("search").value = "";
+      history.pushState(
+        { miniApp: true, path: state.path, purchaseMode },
+        "",
+        location.href
+      );
+      render();
+    }
+
+    history.replaceState(
+      { miniApp: true, path: [], purchaseMode: false },
+      "",
+      location.href
+    );
+    window.addEventListener("popstate", event => {
+      const page = event.state?.miniApp ? event.state : {};
+      state.path = Array.isArray(page.path) ? [...page.path] : [];
+      state.purchaseMode = Boolean(page.purchaseMode);
+      state.search = "";
+      document.getElementById("search").value = "";
+      render();
+    });
+
+    function goBackFromGesture() {
+      if (state.search) {
+        state.search = "";
+        document.getElementById("search").value = "";
+        render();
+        return true;
+      }
+      if (state.purchaseMode && (state.purchaseView === "orders" || state.purchaseView === "analysis")) {
+        state.purchaseView = "popular";
+        render();
+        return true;
+      }
+      // Keep the gesture inside the Mini App at its home screen.
+      if (!state.path.length && !state.purchaseMode) return false;
+      history.back();
+      return true;
+    }
+
+    let lastBackGestureAt = 0;
+    function triggerBackGesture() {
+      const now = Date.now();
+      if (now - lastBackGestureAt < 650) return false;
+      if (!goBackFromGesture()) return false;
+      lastBackGestureAt = now;
+      return true;
+    }
+
+    function hasBackTarget() {
+      return Boolean(state.search || (state.purchaseMode && state.purchaseView !== "popular") || state.path.length || state.purchaseMode);
+    }
+
+    document.getElementById("back-button").addEventListener("click", () => {
+      if (goBackFromGesture()) lastBackGestureAt = Date.now();
+    });
+
+    let touchStart = null;
+    let touchBackGestureClaimed = false;
+    window.addEventListener("touchstart", event => {
+      if (event.touches.length !== 1 || event.target.closest("input, textarea, select, button, a")) {
+        touchStart = null;
+        return;
+      }
+      const touch = event.touches[0];
+      touchStart = { x: touch.clientX, y: touch.clientY };
+      touchBackGestureClaimed = false;
+    }, { passive: true });
+
+    window.addEventListener("touchmove", event => {
+      if (!touchStart || event.touches.length !== 1) return;
+      const touch = event.touches[0];
+      const deltaX = touch.clientX - touchStart.x;
+      const deltaY = touch.clientY - touchStart.y;
+      if (deltaX >= 24 && deltaX > Math.abs(deltaY) * 1.2) {
+        touchBackGestureClaimed = true;
+        event.preventDefault();
+      }
+    }, { passive: false });
+
+    window.addEventListener("touchend", event => {
+      if (!touchStart || event.changedTouches.length !== 1) {
+        touchStart = null;
+        touchBackGestureClaimed = false;
+        return;
+      }
+      const touch = event.changedTouches[0];
+      const deltaX = touch.clientX - touchStart.x;
+      const deltaY = Math.abs(touch.clientY - touchStart.y);
+      touchStart = null;
+      const shouldGoBack = deltaX >= 75 && deltaY <= 90;
+      touchBackGestureClaimed = false;
+      if (shouldGoBack) triggerBackGesture();
+    }, { passive: false });
+    window.addEventListener("touchcancel", () => {
+      touchStart = null;
+      touchBackGestureClaimed = false;
+    }, { passive: true });
+
+    let pointerStart = null;
+    window.addEventListener("pointerdown", event => {
+      if (event.pointerType !== "touch" || !event.isPrimary || event.target.closest("input, textarea, select, button, a")) {
+        pointerStart = null;
+        return;
+      }
+      pointerStart = { x: event.clientX, y: event.clientY };
+    }, true);
+    window.addEventListener("pointerup", event => {
+      if (!pointerStart || event.pointerType !== "touch") {
+        pointerStart = null;
+        return;
+      }
+      const deltaX = event.clientX - pointerStart.x;
+      const deltaY = Math.abs(event.clientY - pointerStart.y);
+      pointerStart = null;
+      if (deltaX >= 70 && deltaY <= 90) triggerBackGesture();
+    }, true);
+    window.addEventListener("pointercancel", () => { pointerStart = null; }, true);
+
+    let trackpadDeltaX = 0;
+    let trackpadResetTimer = null;
+    window.addEventListener("wheel", event => {
+      if (event.ctrlKey || event.target.closest("input, textarea, select") || Math.abs(event.deltaX) <= Math.abs(event.deltaY)) {
+        trackpadDeltaX = 0;
+        return;
+      }
+      // With natural scrolling, a rightward two-finger swipe reports negative deltaX.
+      trackpadDeltaX += event.deltaX;
+      clearTimeout(trackpadResetTimer);
+      trackpadResetTimer = setTimeout(() => { trackpadDeltaX = 0; }, 180);
+      if (trackpadDeltaX <= -100 && triggerBackGesture()) {
+        trackpadDeltaX = 0;
+        event.preventDefault();
+      }
+    }, { passive: false });
+
+    function renderAnalysis() {
+      const panel = document.getElementById("analysis-panel");
+      if (!panel.firstChild) {
+        const toolbar = document.createElement("div"); toolbar.className = "analysis-toolbar";
+        const heading = document.createElement("strong"); heading.textContent = "Продажи Paradise · МоегоСклада";
+        const status = document.createElement("div"); status.className = "group-meta"; status.id = "analysis-status";
+        const dates = document.createElement("div"); dates.className = "analysis-dates";
+        for (const [key, label] of [["from", "С"], ["to", "По"]]) {
+          const wrapper = document.createElement("label"); wrapper.textContent = label;
+          const input = document.createElement("input"); input.type = "date"; input.id = `analysis-${key}`;
+          input.value = key === "from" ? state.analysisFrom : state.analysisTo;
+          input.max = defaultDates.today;
+          wrapper.append(input); dates.append(wrapper);
+        }
+        const periodActions = document.createElement("div"); periodActions.className = "analysis-actions";
+        const apply = document.createElement("button"); apply.type = "button"; apply.className = "analysis-update"; apply.textContent = "Показать период";
+        apply.addEventListener("click", () => {
+          const from = document.getElementById("analysis-from").value;
+          const to = document.getElementById("analysis-to").value;
+          const days = (Date.parse(to) - Date.parse(from)) / 86400000;
+          if (!from || !to || !Number.isFinite(days) || days < 0 || days >= 366 || to > defaultDates.today) {
+            state.analysisError = "Выберите даты по порядку: период не больше года и не позднее сегодня."; renderAnalysis(); return;
+          }
+          state.analysisFrom = from; state.analysisTo = to; state.analysis = null; state.analysisExcel = null;
+          loadAnalysis();
+        });
+        const preset = document.createElement("button"); preset.type = "button"; preset.className = "purchase-view-tab"; preset.textContent = "Последние 3 полных месяца";
+        preset.addEventListener("click", () => {
+          state.analysisFrom = defaultDates.from; state.analysisTo = defaultDates.to;
+          document.getElementById("analysis-from").value = state.analysisFrom;
+          document.getElementById("analysis-to").value = state.analysisTo;
+          state.analysis = null; state.analysisExcel = null; loadAnalysis();
+        });
+        periodActions.append(apply, preset);
+        const controls = document.createElement("div"); controls.className = "analysis-controls";
+        const search = document.createElement("input"); search.type = "search"; search.placeholder = "Найти товар"; search.setAttribute("aria-label", "Найти товар в анализе");
+        search.addEventListener("input", () => { state.analysisSearch = search.value; state.analysisLimit = 100; renderAnalysis(); });
+        const filter = document.createElement("select"); filter.setAttribute("aria-label", "Класс ABC‑XYZ");
+        ["Все классы", ...[..."ABC"].flatMap(a => [..."XYZ"].map(x => a + x))].forEach((label, index) => {
+          const option = document.createElement("option"); option.value = index ? label : "all"; option.textContent = label; filter.append(option);
+        });
+        filter.addEventListener("change", () => { state.analysisClass = filter.value; state.analysisLimit = 100; renderAnalysis(); });
+        controls.append(search, filter);
+        const update = document.createElement("button"); update.type = "button"; update.className = "analysis-update"; update.textContent = "Обновить расчёт";
+        update.addEventListener("click", () => loadAnalysis(true));
+        const exportButton = document.createElement("button"); exportButton.type = "button"; exportButton.className = "analysis-update";
+        exportButton.id = "analysis-export"; exportButton.textContent = "Скачать Excel";
+        exportButton.addEventListener("click", shareAnalysisExcel);
+        toolbar.append(heading, dates, periodActions, status, controls, update, exportButton);
+        const list = document.createElement("div"); list.id = "analysis-list"; list.className = "analysis-panel";
+        panel.append(toolbar, list);
+      }
+      const snapshot = state.analysis;
+      const status = document.getElementById("analysis-status");
+      status.textContent = state.analysisError || (state.analysisLoading ? "Рассчитываем продажи и возвраты…" : snapshot
+        ? `${snapshot.period_from.split("-").reverse().join(".")} — ${snapshot.period_to.split("-").reverse().join(".")} · ${snapshot.items.length} товаров · обновлено ${new Date(snapshot.calculated_at).toLocaleString("ru-RU")}`
+        : "Расчёт ещё не создан.");
+      const exportButton = document.getElementById("analysis-export");
+      exportButton.disabled = !snapshot || state.analysisLoading || state.analysisExcelLoading;
+      exportButton.textContent = state.analysisExcelLoading ? "Готовим Excel…" : state.analysisExcelError ? "Повторить Excel" : "Скачать Excel";
+      const list = document.getElementById("analysis-list"); list.replaceChildren();
+      if (!snapshot) return;
+      const summary = document.createElement("div"); summary.className = "analysis-card";
+      summary.textContent = `Выручка: ${new Intl.NumberFormat("ru-RU").format(snapshot.total_revenue)} ₽. A/B/C — вклад в выручку; X/Y/Z — стабильность спроса по неделям. Товары без продаж и с редкими продажами относятся к Z.`;
+      list.append(summary);
+      const query = state.analysisSearch.trim().toLocaleLowerCase("ru");
+      const items = snapshot.items.filter(item => (state.analysisClass === "all" || item.class === state.analysisClass)
+        && (!query || item.name.toLocaleLowerCase("ru").includes(query)));
+      const count = document.createElement("div"); count.className = "group-meta"; count.textContent = `Найдено: ${items.length}`; list.append(count);
+      for (const item of items.slice(0, state.analysisLimit)) {
+        const card = document.createElement("div"); card.className = "analysis-card";
+        const head = document.createElement("div"); head.className = "analysis-card-head";
+        const name = document.createElement("span"); name.textContent = item.name;
+        const badge = document.createElement("span"); badge.className = "analysis-class"; badge.textContent = item.class;
+        head.append(name, badge);
+        const meta = document.createElement("div"); meta.className = "group-meta";
+        meta.textContent = `Выручка ${new Intl.NumberFormat("ru-RU").format(item.revenue)} ₽ · продано ${item.quantity} шт. · остаток ${item.stock} шт. · в среднем ${item.weekly_average} шт./нед.${item.note ? ` · ${item.note}` : ""}`;
+        card.append(head, meta); list.append(card);
+      }
+      if (items.length > state.analysisLimit) {
+        const more = document.createElement("button"); more.type = "button"; more.className = "purchase-view-tab"; more.textContent = "Показать ещё";
+        more.addEventListener("click", () => { state.analysisLimit += 100; renderAnalysis(); }); list.append(more);
+      }
+    }
+
+    let analysisRequestId = 0;
+    let analysisExcelPendingKey = null;
+    function analysisQuery() {
+      return `from=${encodeURIComponent(state.analysisFrom)}&to=${encodeURIComponent(state.analysisTo)}`;
+    }
+    async function prepareAnalysisExcel(snapshot) {
+      const key = `${snapshot.period_from}:${snapshot.period_to}:${snapshot.calculated_at || ""}`;
+      if (analysisExcelPendingKey === key) return;
+      analysisExcelPendingKey = key;
+      state.analysisExcel = null; state.analysisExcelError = false; state.analysisExcelLoading = true; renderAnalysis();
+      try {
+        const response = await fetch(`/api/abc-xyz/export?${analysisQuery()}`, { headers: apiHeaders(), cache: "no-store" });
+        if (!response.ok) throw new Error(await response.text());
+        const blob = await response.blob();
+        if (blob.size > 50 * 1024 * 1024) throw new Error("Файл слишком большой.");
+        if (state.analysis && `${state.analysis.period_from}:${state.analysis.period_to}:${state.analysis.calculated_at || ""}` === key) {
+          const displayFileDate = value => value.split("-").reverse().join(".");
+          const name = `Paradise_ABC-XYZ_${displayFileDate(snapshot.period_from)}_${displayFileDate(snapshot.period_to)}.xlsx`;
+          state.analysisExcel = new File([blob], name, { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+        }
+      } catch (error) {
+        if (state.analysis && `${state.analysis.period_from}:${state.analysis.period_to}:${state.analysis.calculated_at || ""}` === key) {
+          state.analysisExcelError = true;
+        }
+        console.warn("Не удалось подготовить Excel", error);
+      } finally {
+        if (analysisExcelPendingKey === key) {
+          analysisExcelPendingKey = null;
+          state.analysisExcelLoading = false; renderAnalysis();
+        }
+      }
+    }
+    function shareAnalysisExcel() {
+      const file = state.analysisExcel;
+      if (!file) { if (state.analysis) prepareAnalysisExcel(state.analysis); return; }
+      if (navigator.share && navigator.canShare?.({ files: [file] })) {
+        navigator.share({ files: [file] }).catch(error => {
+          if (error.name !== "AbortError") downloadPurchasePdf(file);
+        });
+      } else downloadPurchasePdf(file);
+    }
+    async function loadAnalysis(refresh = false) {
+      const requestId = ++analysisRequestId;
+      state.analysisLoading = true; state.analysisError = ""; renderAnalysis();
+      try {
+        let method = refresh ? "POST" : "GET";
+        const query = analysisQuery();
+        while (requestId === analysisRequestId && state.purchaseMode && state.purchaseView === "analysis") {
+          const response = await fetch(`/api/abc-xyz?${query}`, { method, headers: apiHeaders(), cache: "no-store" });
+          method = "GET";
+          const data = await response.json();
+          if (requestId !== analysisRequestId) return;
+          if (!response.ok) throw new Error(data.message || `Ошибка ${response.status}`);
+          if (data.snapshot) {
+            const previous = state.analysis?.calculated_at;
+            state.analysis = data.snapshot;
+            if (data.status === "ready" && (previous !== data.snapshot.calculated_at || !state.analysisExcel)) prepareAnalysisExcel(data.snapshot);
+          }
+          renderAnalysis();
+          if (data.status !== "calculating") break;
+          await new Promise(resolve => setTimeout(resolve, 5000));
+        }
+      } catch (error) {
+        if (requestId === analysisRequestId) state.analysisError = error.message || "Не удалось загрузить анализ.";
+      } finally {
+        if (requestId === analysisRequestId) { state.analysisLoading = false; renderAnalysis(); }
+      }
+    }
+
     function render() {
       const query = state.search.trim().toLocaleLowerCase("ru");
       const title = document.getElementById("title");
@@ -195,28 +1241,250 @@
 
       const isSearch = Boolean(query);
       const isPurchase = state.purchaseMode;
+      const isOrdersView = isPurchase && state.purchaseView === "orders";
+      const isAnalysisView = isPurchase && state.purchaseView === "analysis";
+      document.querySelector(".searchbox").hidden = isAnalysisView;
+      document.getElementById("stock-filters").hidden = isPurchase;
+      document.querySelectorAll(".stock-filter").forEach(button => {
+        const active = button.dataset.stockMode === state.stockMode;
+        button.classList.toggle("active", active);
+        button.setAttribute("aria-pressed", String(active));
+      });
+      const backButton = document.getElementById("back-button");
+      backButton.disabled = !hasBackTarget();
+      const showPurchaseRecommendations = isPurchase && !isOrdersView && !isAnalysisView;
+      document.getElementById("purchase-period").hidden = !showPurchaseRecommendations;
+      document.getElementById("purchase-view-tabs").hidden = !isPurchase;
+      const ordersViewTab = document.getElementById("orders-view-tab");
+      ordersViewTab.textContent = isOrdersView ? "← К популярным товарам" : "Заказы покупателей";
+      ordersViewTab.classList.toggle("active", isOrdersView);
+      document.getElementById("analysis-view-tab").classList.toggle("active", isAnalysisView);
+      const periodLabel = document.getElementById("period-label");
+      periodLabel.textContent = state.purchasePeriod === "week" ? "За неделю" : "За месяц";
+      document.querySelectorAll(".period-option").forEach(option => {
+        option.setAttribute("aria-selected", String(option.dataset.period === state.purchasePeriod));
+      });
+      crumbs.hidden = isPurchase;
       const current = getNode(state.path);
       const childEntries = Object.entries(current || inventory).filter(([name]) => name !== "goods");
       const hasChildren = childEntries.length > 0;
-      const showProducts = isSearch || isPurchase || Boolean(current?.goods?.length && !hasChildren);
-      title.textContent = isPurchase ? "Список закупки" : isSearch ? "Результаты поиска" : state.path[state.path.length - 1] || "Категории";
-      subtitle.textContent = isPurchase ? "Черновик, склад не изменяется" : isSearch ? "Поиск по всем товарам в наличии" : "Остатки из МоегоСклада";
-      notice.hidden = inventoryStatus === "live" || isPurchase || isSearch;
+      const showProducts = !isAnalysisView && (isSearch || isPurchase || Boolean(current?.goods?.length && !hasChildren));
+      title.textContent = isAnalysisView ? "ABC‑XYZ анализ" : isOrdersView ? "Заказы покупателей" : isPurchase ? "Список закупки" : isSearch ? "Результаты поиска" : state.path[state.path.length - 1] || "Категории";
+      subtitle.textContent = isAnalysisView ? "Выручка и спрос за выбранный период" : isOrdersView ? "Запросы, принятые в магазине" : isPurchase ? "Черновик, склад не изменяется" : isSearch ? "Поиск по выбранному остатку" : "Остатки из МоегоСклада";
+      notice.hidden = inventoryStatus === "live" || isPurchase;
       if (inventoryStatus === "demo") notice.textContent = "Макет: демонстрационные данные, подключение к МоемуСкладу ещё не настроено.";
+      if (inventoryStatus === "loading") notice.textContent = "Загружаем категории и остатки из МоегоСклада…";
       if (inventoryStatus === "error") notice.textContent = "Не удалось получить остатки. Откройте приложение из Telegram и проверьте соединение.";
-      const purchaseTotal = state.purchase.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
-      count.textContent = isPurchase ? `${state.purchase.length} позиций · ${purchaseTotal.toLocaleString("ru-RU")} ₽` : "";
+      const regularItems = state.purchase.filter(item => purchaseQuantity(item) > 0);
+      const pricedItems = regularItems.filter(item => Number.isFinite(Number(item.purchasePrice)) && item.purchasePrice !== null && item.purchasePrice !== "");
+      const purchaseTotal = pricedItems.reduce((sum, item) => sum + Number(item.purchasePrice) * purchaseQuantity(item), 0);
+      const unpricedItems = regularItems.length - pricedItems.length;
+      count.textContent = "";
+      count.hidden = isPurchase;
 
-      const homeCrumb = makeButton("Все категории", () => { state.path = []; state.purchaseMode = false; render(); }, "");
+      const homeCrumb = makeButton("Все категории", () => navigate([], false), "");
       crumbs.append(homeCrumb);
       state.path.forEach((part, index) => {
         const separator = document.createElement("span"); separator.textContent = "›"; crumbs.append(separator);
-        crumbs.append(makeButton(part, () => { state.path = state.path.slice(0, index + 1); state.purchaseMode = false; render(); }, ""));
+        crumbs.append(makeButton(part, () => navigate(state.path.slice(0, index + 1), false), ""));
       });
 
-      const products = isPurchase ? state.purchase.map(item => ({ ...item.product, requested: item.quantity }))
+      const products = showPurchaseRecommendations ? state.popularGoods
         : isSearch ? allProducts(inventory).filter(product => product.name.toLocaleLowerCase("ru").includes(query))
-        : (current?.goods || []).map(product => ({ ...product, path: state.path }));
+        : isOrdersView ? [] : (current?.goods || []).map(product => ({ ...product, path: state.path }));
+
+      productsEl.className = showPurchaseRecommendations ? "purchase-recommendations" : "product-list";
+
+      draftEl.hidden = !showPurchaseRecommendations;
+      document.getElementById("recommendation-title").hidden = !showPurchaseRecommendations;
+      document.getElementById("customer-orders-panel").hidden = !isOrdersView;
+      document.getElementById("analysis-panel").hidden = !isAnalysisView;
+      if (isAnalysisView) renderAnalysis();
+      if (showPurchaseRecommendations) {
+        draftEl.replaceChildren();
+        const summary = document.createElement("div");
+        summary.className = "purchase-summary";
+        const draftTitle = document.createElement("div");
+        draftTitle.className = "section-title";
+        draftTitle.style.margin = "0 0 5px";
+        draftTitle.textContent = "Черновик закупки";
+        const draftHint = document.createElement("div");
+        draftHint.className = "group-meta";
+        draftHint.textContent = "Цены и бюджет относятся только к обычной закупке. Заказы покупателей учитываются в штуках. Черновик хранится на этом устройстве.";
+        summary.append(draftTitle, draftHint);
+
+        if (!state.purchase.length) {
+          const empty = document.createElement("div");
+          empty.className = "empty";
+          empty.textContent = "Черновик пуст. Добавьте товары из остатков или популярных продаж ниже.";
+          summary.append(empty);
+        } else {
+          state.purchase.forEach(item => {
+            const line = document.createElement("div");
+            line.className = "purchase-line";
+            const copy = document.createElement("div"); copy.className = "purchase-line-copy";
+            const name = document.createElement("div"); name.className = "purchase-line-name"; name.textContent = item.product.name;
+            const meta = document.createElement("div"); meta.className = "purchase-line-meta";
+            const orderUnits = customerOrderQuantity(item);
+            const regularUnits = purchaseQuantity(item);
+            if (orderUnits) {
+              meta.textContent = regularUnits
+                ? `В закупку: ${regularUnits} шт. · Заказы покупателей: ${orderUnits} шт.`
+                : `${orderUnits} шт. · заказ покупателя`;
+            } else {
+              const retailPrice = Number(item.product.price) || 0;
+              meta.textContent = `${item.quantity} шт. · витринная цена ${retailPrice ? `${retailPrice.toLocaleString("ru-RU")} ₽/шт.` : "не указана"}`;
+            }
+            copy.append(name, meta);
+            if (regularUnits) {
+              const costEditor = document.createElement("div"); costEditor.className = "purchase-price-editor";
+              const costLabel = document.createElement("label"); costLabel.textContent = item.purchasePriceLoading
+                ? "Цена закупки за 1 шт. · ищу последнюю приёмку…"
+                : "Цена закупки за 1 шт.";
+              const costInput = document.createElement("input"); costInput.className = "purchase-price-input"; costInput.type = "number"; costInput.min = "0"; costInput.step = "0.01"; costInput.inputMode = "decimal";
+              costInput.placeholder = item.purchasePriceLoading ? "Загружаю…" : "Введите цену"; costInput.value = item.purchasePrice == null ? "" : item.purchasePrice;
+              costInput.setAttribute("aria-label", `Закупочная цена за штуку: ${item.product.name}`);
+              costInput.addEventListener("change", () => {
+                const raw = costInput.value.trim();
+                item.purchasePrice = raw === "" ? null : Math.max(0, Number(raw));
+                item.purchasePriceEdited = true;
+                savePurchase(); render();
+              });
+              costEditor.append(costLabel, costInput);
+              copy.append(costEditor);
+            }
+            const controls = document.createElement("div"); controls.className = "purchase-line-controls";
+            const stepper = document.createElement("div"); stepper.className = "purchase-stepper";
+            const decrease = makeButton("−", () => {
+              decrementDraftItem(item);
+            }, "stepper-button");
+            decrease.setAttribute("aria-label", `Уменьшить количество: ${item.product.name}`);
+            const quantity = document.createElement("span"); quantity.className = "stepper-value"; quantity.textContent = item.quantity;
+            const increase = makeButton("+", () => {
+              item.quantity += 1;
+              savePurchase(); render();
+            }, "stepper-button");
+            increase.setAttribute("aria-label", `Увеличить количество: ${item.product.name}`);
+            stepper.append(decrease, quantity, increase);
+            const remove = makeButton("Убрать", () => {
+              clearOrderLinksForDraftItem(item);
+              state.purchase = state.purchase.filter(entry => entry !== item);
+              savePurchase(); render();
+            }, "remove-button");
+            controls.append(stepper, remove); line.append(copy, controls); summary.append(line);
+          });
+        }
+        const footerTotal = document.createElement("div");
+        footerTotal.className = "purchase-total";
+        const units = state.purchase.reduce((sum, item) => sum + item.quantity, 0);
+        const regularUnits = regularItems.reduce((sum, item) => sum + purchaseQuantity(item), 0);
+        const orderUnits = units - regularUnits;
+        footerTotal.textContent = `${state.purchase.length} ${positionWord(state.purchase.length)} · ${units} шт.`
+          + (orderUnits ? ` · заказы покупателей: ${orderUnits} шт.` : "")
+          + (regularUnits ? ` · по закупочным ценам: ${purchaseTotal.toLocaleString("ru-RU")} ₽${unpricedItems ? ` · без цены: ${unpricedItems}` : ""}` : "");
+        if (state.purchase.length) {
+          const exportButton = makeButton("Сохранить черновик в PDF", sharePreparedPurchasePdf, "purchase-pdf-button");
+          exportButton.type = "button";
+          const exportFeedback = document.createElement("div");
+          exportFeedback.className = "purchase-pdf-feedback";
+          exportFeedback.setAttribute("aria-live", "polite");
+          const clearButton = makeButton("Удалить всё", clearPurchaseDraft, "purchase-clear-button");
+          clearButton.type = "button";
+          summary.append(footerTotal, exportButton, exportFeedback, clearButton);
+        } else {
+          summary.append(footerTotal);
+        }
+        const budgetRow = document.createElement("div"); budgetRow.className = "budget-row";
+        const budgetLabel = document.createElement("label"); budgetLabel.className = "budget-label"; budgetLabel.textContent = "Бюджет на закупку"; budgetLabel.htmlFor = "purchase-budget";
+        const budgetInput = document.createElement("input"); budgetInput.className = "budget-input"; budgetInput.id = "purchase-budget"; budgetInput.type = "number"; budgetInput.min = "0"; budgetInput.step = "100"; budgetInput.inputMode = "decimal"; budgetInput.placeholder = "Сумма, ₽";
+        budgetInput.value = state.purchaseBudget == null ? "" : state.purchaseBudget;
+        budgetInput.addEventListener("change", () => {
+          const raw = budgetInput.value.trim();
+          state.purchaseBudget = raw === "" ? null : Math.max(0, Number(raw));
+          savePurchaseBudget(); render();
+        });
+        budgetRow.append(budgetLabel, budgetInput);
+        const budgetStatus = document.createElement("div"); budgetStatus.className = "budget-status";
+        if (state.purchaseBudget != null) {
+          const difference = state.purchaseBudget - purchaseTotal;
+          budgetStatus.textContent = unpricedItems
+            ? `Остаток бюджета будет точным, когда указаны цены обычной закупки.`
+            : difference >= 0
+              ? `Остаток бюджета: ${difference.toLocaleString("ru-RU")} ₽`
+              : `Превышение бюджета: ${Math.abs(difference).toLocaleString("ru-RU")} ₽`;
+          if (!unpricedItems && difference < 0) budgetStatus.classList.add("over");
+        } else if (unpricedItems) {
+          budgetStatus.textContent = "Укажите цены обычной закупки для расчёта суммы.";
+        }
+        summary.append(budgetRow, budgetStatus);
+        draftEl.append(summary);
+      } else {
+        draftEl.replaceChildren();
+      }
+
+      if (isOrdersView) {
+        const orderList = document.getElementById("customer-orders-list");
+        orderList.replaceChildren();
+        if (state.customerOrdersLoading) {
+          orderList.append(Object.assign(document.createElement("div"), { className: "orders-empty", textContent: "Загружаем заказы…" }));
+        } else if (state.customerOrdersError) {
+          orderList.append(Object.assign(document.createElement("div"), { className: "orders-empty", textContent: "Не удалось загрузить заказы. Попробуйте обновить список." }));
+          const retry = makeButton("Обновить список", loadCustomerOrders, "order-submit");
+          orderList.append(retry);
+        } else if (!state.customerOrders.length) {
+          orderList.append(Object.assign(document.createElement("div"), { className: "orders-empty", textContent: "Заказов пока нет. Добавьте первый запрос покупателя выше." }));
+        } else {
+          state.customerOrders.forEach(order => {
+            const card = document.createElement("article"); card.className = "customer-order";
+            const head = document.createElement("div"); head.className = "customer-order-head";
+            const copy = document.createElement("div");
+            const product = document.createElement("div"); product.className = "customer-order-name"; product.textContent = order.product_name;
+            const created = new Date(order.created_at);
+            const createdDate = formatDisplayDate(created);
+            const createdTime = createdDate ? created.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" }) : "";
+            const date = document.createElement("div"); date.className = "customer-order-date"; date.textContent = createdDate ? `${createdDate} ${createdTime}` : "";
+            copy.append(product, date); head.append(copy); card.append(head);
+            const details = [order.quantity ? `${order.quantity} шт.` : "", order.customer_name, order.contact].filter(Boolean).join(" · ");
+            if (details) { const meta = document.createElement("div"); meta.className = "customer-order-meta"; meta.textContent = details; card.append(meta); }
+            if (order.note) { const note = document.createElement("div"); note.className = "customer-order-note"; note.textContent = order.note; card.append(note); }
+            if (order.has_photo) {
+              const photo = document.createElement("img"); photo.className = "customer-order-photo"; photo.alt = `Фото: ${order.product_name}`;
+              card.append(photo); loadOrderPhoto(order.id, photo);
+            }
+            const actions = document.createElement("div"); actions.className = "customer-order-actions";
+            const hasTrackedContribution = state.purchase.some(item => Number(item.orderContributions?.[order.id]) > 0);
+            const hasLegacyDraftLine = state.purchase.some(item => item.product.name === order.product_name);
+            const alreadyAdded = hasTrackedContribution || (savedAddedOrderIds.has(order.id) && hasLegacyDraftLine);
+            if (savedAddedOrderIds.has(order.id) && !alreadyAdded) {
+              savedAddedOrderIds.delete(order.id);
+              localStorage.setItem("paradise-orders-added-to-draft", JSON.stringify([...savedAddedOrderIds]));
+            }
+            const toDraft = makeButton(alreadyAdded ? "Уже в черновике на этом устройстве" : "Добавить в черновик закупки", () => {
+              if (savedAddedOrderIds.has(order.id)) return;
+              addToPurchase({ name: order.product_name, stock: 0, price: null, buy_price: null }, order.quantity, order.id);
+              savedAddedOrderIds.add(order.id);
+              localStorage.setItem("paradise-orders-added-to-draft", JSON.stringify([...savedAddedOrderIds]));
+              state.purchaseView = "popular";
+              render();
+            });
+            toDraft.disabled = alreadyAdded;
+            actions.append(toDraft);
+            const remove = makeButton("Удалить", async () => {
+              if (!window.confirm("Удалить этот заказ?")) return;
+              try {
+                const response = await fetch(`/api/customer-orders/${encodeURIComponent(order.id)}`, { method: "DELETE", headers: apiHeaders() });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                removeOrderFromPurchase(order);
+                const photoUrl = orderPhotoUrls.get(order.id);
+                if (photoUrl) URL.revokeObjectURL(photoUrl);
+                orderPhotoUrls.delete(order.id);
+                await loadCustomerOrders();
+              } catch (error) { console.error("Не удалось удалить заказ", error); tg?.showAlert("Не удалось удалить заказ."); }
+            }, "order-delete");
+            actions.append(remove); card.append(actions); orderList.append(card);
+          });
+        }
+      }
 
       if (!showProducts && !isPurchase && !isSearch) {
         childEntries.forEach(([name, child]) => {
@@ -225,50 +1493,104 @@
           const icon = document.createElement("span"); icon.className = "group-icon"; icon.textContent = "▦";
           const copy = document.createElement("span"); copy.className = "group-copy";
           const label = document.createElement("span"); label.className = "group-name"; label.textContent = name;
-          const meta = document.createElement("span"); meta.className = "group-meta"; meta.textContent = `${quantity(child)} шт. в наличии`;
+          const meta = document.createElement("span"); meta.className = "group-meta";
+          meta.textContent = state.stockMode === "zero" ? `${allProducts(child).length} товаров с нулевым остатком`
+            : state.stockMode === "negative" ? `${allProducts(child).length} товаров с минусовым остатком`
+            : `${quantity(child)} шт. в наличии`;
           const arrow = document.createElement("span"); arrow.className = "chevron"; arrow.textContent = "›";
           copy.append(label, meta); card.append(icon, copy, arrow);
-          card.addEventListener("click", () => { state.path.push(name); render(); });
+          card.addEventListener("click", () => navigate([...state.path, name], false));
           groupsEl.append(card);
         });
         if (!childEntries.length && inventoryStatus === "live") {
-          const empty = document.createElement("div"); empty.className = "empty"; empty.textContent = "В этой группе сейчас нет товаров с остатком";
+          const empty = document.createElement("div"); empty.className = "empty";
+          empty.textContent = state.stockMode === "zero" ? "Товаров с нулевым остатком нет"
+            : state.stockMode === "negative" ? "Товаров с минусовым остатком нет"
+            : "В этой группе сейчас нет товаров с остатком";
           groupsEl.append(empty);
         }
       }
 
-      const showProductSection = showProducts || isPurchase || isSearch || products.length > 0;
+      const showProductSection = !isOrdersView && !isAnalysisView && (showProducts || isPurchase || isSearch || products.length > 0);
       if (showProductSection) {
         productsEl.hidden = false;
-        products.forEach(product => {
+        const appendProductCard = (container, product) => {
           const card = document.createElement("article"); card.className = "product-card";
           const name = document.createElement("div"); name.className = "product-name"; name.textContent = product.name;
           const info = document.createElement("div"); info.className = "product-info";
-          const price = document.createElement("span"); price.className = "price"; price.textContent = product.price ? `${product.price.toLocaleString("ru-RU")} ₽` : "Цена не указана";
-          const stock = document.createElement("span"); stock.className = "stock"; stock.textContent = isPurchase ? `К закупке: ${product.requested}` : `${product.stock} шт. в наличии`;
+          const price = document.createElement("span"); price.className = "price"; price.textContent = product.price ? `${Number(product.price).toLocaleString("ru-RU")} ₽` : "Цена не указана";
+          const stock = document.createElement("span"); stock.className = "stock";
+          stock.textContent = `${Number(product.stock) || 0} шт. ${product.stock < 0 ? "(минус)" : product.stock === 0 ? "(нет на складе)" : "в наличии"}`;
+          if (product.stock === 0) stock.classList.add("zero");
+          if (product.stock < 0) stock.classList.add("negative");
           info.append(price, stock); card.append(name, info);
-          if (!isPurchase) {
+          if (isPurchase) {
+            const buyPrice = document.createElement("div");
+            buyPrice.className = "group-meta";
+            buyPrice.textContent = product.buy_price == null
+              ? "В истории приёмок цена не найдена"
+              : `Последняя приёмка: ${Number(product.buy_price).toLocaleString("ru-RU")} ₽/шт.`;
+            card.append(buyPrice);
+            const sales = document.createElement("div");
+            sales.className = "group-meta";
+            const periodName = state.purchasePeriod === "week" ? "неделю" : "месяц";
+            sales.textContent = `Продано за ${periodName}: ${product.quantity} шт. · в чеках: ${product.checks}`;
+            card.append(sales);
             const added = state.purchase.some(item => item.product.name === product.name);
-            const add = makeButton(added ? "Добавлено в закупку ✓" : "＋ В список закупки", () => {
-              const existing = state.purchase.find(item => item.product.name === product.name);
-              if (existing) state.purchaseMode = true;
-              else state.purchase.push({ product, quantity: 1 });
+            const add = makeButton(added ? "Увеличь количество в черновике" : "＋ Добавить в черновик", () => {
+              addToPurchase(product);
               render();
-            }, `add-button${added ? " added" : ""}`);
+            }, "add-button");
             card.append(add);
           } else {
-            const controls = document.createElement("div"); controls.className = "qty-controls";
-            const item = state.purchase.find(entry => entry.product.name === product.name);
-            const minus = makeButton("−", () => { item.quantity = Math.max(1, item.quantity - 1); render(); }, "qty-button");
-            const amount = document.createElement("span"); amount.className = "qty-value"; amount.textContent = String(product.requested);
-            const plus = makeButton("＋", () => { item.quantity += 1; render(); }, "qty-button");
-            const remove = makeButton("Убрать", () => { state.purchase = state.purchase.filter(entry => entry.product.name !== product.name); render(); }, "remove-button");
-            controls.append(minus, amount, plus, remove); card.append(controls);
+            const added = state.purchase.some(item => item.product.name === product.name);
+            const add = makeButton(added ? "＋ Ещё 1 шт. в закупку" : "＋ В список закупки", () => {
+              addToPurchase(product);
+              render();
+              loadLatestPurchasePrice(product);
+            }, `add-button${added ? " added" : ""}`);
+            card.append(add);
           }
-          productsEl.append(card);
-        });
-      if (!products.length && (showProducts || isPurchase || isSearch)) {
-          const empty = document.createElement("div"); empty.className = "empty"; empty.textContent = isPurchase ? "Пока ничего не добавлено" : "Ничего не найдено";
+          container.append(card);
+        };
+
+        if (isPurchase && !state.purchaseLoading && !state.purchaseError) {
+          const purchaseCategories = [
+            ["disposable", "Одноразовые устройства"],
+            ["liquids", "Жидкости"],
+            ["cartridges", "Картриджи и испарители"],
+            ["hookah_tobacco", "Табак для кальяна"],
+          ];
+          purchaseCategories.forEach(([key, label]) => {
+            const categoryItems = products.filter(product => product.category_key === key);
+            const section = document.createElement("section");
+            section.className = "popular-category";
+            const heading = document.createElement("h2");
+            heading.className = "popular-category-title";
+            heading.textContent = `Топ‑5: ${label}`;
+            section.append(heading);
+            if (categoryItems.length) {
+              const list = document.createElement("div");
+              list.className = "popular-category-list";
+              categoryItems.forEach(product => appendProductCard(list, product));
+              section.append(list);
+            } else {
+              const emptyCategory = document.createElement("div");
+              emptyCategory.className = "popular-category-empty";
+              emptyCategory.textContent = "За выбранный период продаж не найдено";
+              section.append(emptyCategory);
+            }
+            productsEl.append(section);
+          });
+        } else {
+          products.forEach(product => appendProductCard(productsEl, product));
+        }
+
+        if (!products.length && (showProducts || isPurchase || isSearch) && (!isPurchase || state.purchaseLoading || state.purchaseError)) {
+          const empty = document.createElement("div"); empty.className = "empty";
+          empty.textContent = isPurchase
+            ? state.purchaseLoading ? "Загружаем продажи по чекам…" : state.purchaseError ? "Не удалось загрузить продажи. Попробуйте ещё раз." : "За выбранный период продаж не найдено. Можно добавить товары через раздел «Остатки»."
+            : isSearch ? "Ничего не найдено" : "В этой категории пока нет товаров";
           productsEl.append(empty);
         }
       } else {
@@ -278,8 +1600,10 @@
       const badge = document.getElementById("purchase-count");
       badge.hidden = !state.purchase.length;
       badge.textContent = state.purchase.length;
+      savePurchase();
       document.getElementById("stock-tab").classList.toggle("active", !isPurchase);
       document.getElementById("purchase-tab").classList.toggle("active", isPurchase);
+      preparePurchasePdf();
     }
 
     document.getElementById("search").addEventListener("input", event => {
@@ -288,35 +1612,188 @@
       render();
     });
 
+    async function loadPurchaseGoods(period) {
+  state.purchaseLoading = true;
+  state.purchaseError = false;
+  state.purchasePeriod = period;
+  state.popularGoods = [];
+  render();
+  const headers = tg?.initData
+    ? { Authorization: `tma ${tg.initData}` }
+    : {};
+
+  try {
+    const response = await fetch(
+      `/api/purchase?period=${encodeURIComponent(period)}`,
+      { headers }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Не удалось загрузить закупку: HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+    state.popularGoods = data.items || [];
+  } catch (error) {
+    state.purchaseError = true;
+    throw error;
+  } finally {
+    state.purchaseLoading = false;
+    render();
+  }
+}
+
     async function loadLiveInventory() {
-      if (!tg) return;
-      if (!tg.initData) {
-        inventory = showDemo ? demoInventory : {};
-        inventoryStatus = showDemo ? "demo" : "error";
+      const requestId = ++stockRequestId;
+      const mode = state.stockMode;
+      if (showDemo) {
+        inventory = mode === "positive" ? demoInventory : {};
+        inventoryStatus = "demo";
         render();
         return;
       }
+      if (stockInventories[mode] && Date.now() - stockInventories[mode].loadedAt < 60_000) {
+        inventory = stockInventories[mode].inventory;
+        inventoryStatus = "live";
+        render();
+        return;
+      }
+      inventory = {};
+      inventoryStatus = "loading";
+      render();
       try {
-        const response = await fetch("/api/stock", {
-          headers: { Authorization: `tma ${tg.initData}` },
+        const headers = tg?.initData
+          ? { Authorization: `tma ${tg.initData}` }
+          : {};
+        const response = await fetch(`/api/stock?mode=${encodeURIComponent(mode)}`, {
+          headers,
           cache: "no-store"
         });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        inventory = convertStockTree(await response.json());
+        const loaded = convertStockTree(await response.json());
+        if (requestId !== stockRequestId) return;
+        inventory = loaded;
+        stockInventories[mode] = { inventory: loaded, loadedAt: Date.now() };
         inventoryStatus = "live";
       } catch (error) {
+        if (requestId !== stockRequestId) return;
         console.error("Live stock loading failed", error);
         inventory = {};
         inventoryStatus = "error";
       }
       render();
     }
+    preparePurchasePdf();
     loadLiveInventory();
-    document.getElementById("stock-tab").addEventListener("click", () => {
-      state.purchaseMode = false; state.path = []; document.getElementById("search").value = ""; state.search = ""; render();
+    if (savedAddedOrderIds.size) loadCustomerOrders();
+    document.getElementById("orders-view-tab").addEventListener("click", async () => {
+      state.purchaseView = state.purchaseView === "orders" ? "popular" : "orders";
+      render();
+      if (state.purchaseView === "orders") await loadCustomerOrders();
     });
-    document.getElementById("purchase-tab").addEventListener("click", () => { state.purchaseMode = true; state.search = ""; render(); });
+    document.getElementById("analysis-view-tab").addEventListener("click", () => {
+      state.purchaseView = state.purchaseView === "analysis" ? "popular" : "analysis";
+      render();
+      if (state.purchaseView === "analysis") loadAnalysis();
+    });
+    document.getElementById("customer-order-form").addEventListener("submit", async event => {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const button = form.querySelector(".order-submit");
+      const feedback = document.getElementById("order-form-feedback");
+      const formData = new FormData(form);
+      const photo = formData.get("photo");
+      feedback.textContent = "";
+      if (photo?.size > 5 * 1024 * 1024) {
+        feedback.textContent = "Фото должно быть не больше 5 МБ.";
+        return;
+      }
+      button.disabled = true;
+      button.textContent = "Сохраняем…";
+      try {
+        const payload = {
+          product_name: formData.get("product_name"),
+          quantity: Number(formData.get("quantity") || 1),
+          customer_name: formData.get("customer_name"),
+          contact: formData.get("contact"),
+          note: formData.get("note"),
+          photo_data: photo?.size ? await fileAsDataUrl(photo) : null,
+        };
+        const response = await fetch("/api/customer-orders", {
+          method: "POST",
+          headers: { ...apiHeaders(), "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!response.ok) throw new Error((await response.text()) || `HTTP ${response.status}`);
+        form.reset();
+        form.elements.quantity.value = "1";
+        feedback.textContent = "Заказ сохранён.";
+        await loadCustomerOrders();
+      } catch (error) {
+        console.error("Не удалось сохранить заказ", error);
+        feedback.textContent = "Не удалось сохранить заказ. Проверьте соединение и попробуйте ещё раз.";
+      } finally {
+        button.disabled = false;
+        button.textContent = "Сохранить заказ";
+      }
+    });
+    document.getElementById("stock-tab").addEventListener("click", () => {
+      navigate([], false);
+    });
+    document.querySelectorAll(".stock-filter").forEach(button => button.addEventListener("click", () => {
+      if (state.stockMode === button.dataset.stockMode) return;
+      state.stockMode = button.dataset.stockMode;
+      state.path = [];
+      state.search = "";
+      document.getElementById("search").value = "";
+      loadLiveInventory();
+    }));
+    document.getElementById("purchase-tab").addEventListener("click", async () => {
+  state.purchaseView = "popular";
+  navigate(state.path, true);
+
+  try {
+    await loadPurchaseGoods(state.purchasePeriod);
     render();
+  } catch (error) {
+    console.error("Не удалось загрузить популярные товары:", error);
+  }
+});
+
+async function selectPurchasePeriod(period) {
+  document.getElementById("period-menu").hidden = true;
+  document.getElementById("period-trigger").setAttribute("aria-expanded", "false");
+  try {
+    await loadPurchaseGoods(period);
+    render();
+  } catch (error) {
+    console.error("Не удалось загрузить популярные товары:", error);
+  }
+}
+
+document.getElementById("period-trigger").addEventListener("click", () => {
+  const menu = document.getElementById("period-menu");
+  menu.hidden = !menu.hidden;
+  document.getElementById("period-trigger").setAttribute("aria-expanded", String(!menu.hidden));
+});
+
+document.querySelectorAll(".period-option").forEach(option => {
+  option.addEventListener("click", () => selectPurchasePeriod(option.dataset.period));
+});
+
+document.addEventListener("click", event => {
+  if (!event.target.closest(".period-picker")) {
+    document.getElementById("period-menu").hidden = true;
+    document.getElementById("period-trigger").setAttribute("aria-expanded", "false");
+  }
+});
+
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") {
+    document.getElementById("period-menu").hidden = true;
+    document.getElementById("period-trigger").setAttribute("aria-expanded", "false");
+  }
+});
   </script>
 </body>
 </html>

@@ -4,3 +4,11 @@ config.py
 *.json
 .DS_Store
 .venv/
+*.sqlite3
+main/customer_order_photos/
+
+.venv-qa/
+__pycache__/
+*.pyc
+.venv311/
+.codex/

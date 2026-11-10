@@ -1,4 +1,8 @@
-FROM python:3.9-alpine3.17
+FROM python:3.11-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    CUSTOMER_ORDERS_DB=/data/customer_orders.sqlite3
 
 COPY requirements.txt /temp/requirements.txt
 
@@ -7,8 +11,10 @@ COPY miniapp /miniapp
 
 WORKDIR /main
 
+VOLUME ["/data"]
+
 EXPOSE 8000
 
-RUN pip install -r /temp/requirements.txt
+RUN python -m pip install --no-cache-dir -r /temp/requirements.txt
 
 CMD ["python", "bot.py"]

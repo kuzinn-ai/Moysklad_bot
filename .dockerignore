@@ -6,4 +6,9 @@
 .env.*
 **/config.py
 **/.DS_Store
+**/*.sqlite*
+**/*.db
+**/customer_order_photos/
 tests
+
+.venv311/
