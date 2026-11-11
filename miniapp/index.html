@@ -556,40 +556,57 @@
     let fallbackPageToken = 0;
     let pageIntent = 0;
     let pendingPage = null;
-    function transitionPage(commit) {
-      activePageTransition?.skipTransition?.();
+    let pageTransitioning = false;
+    function cancelPageTransition() {
       fallbackPageToken += 1;
+      activePageTransition?.skipTransition?.();
+      activePageTransition = null;
       fallbackPageAnimations.forEach(animation => animation.cancel());
       fallbackPageAnimations = [];
-      if (document.startViewTransition && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        const transition = document.startViewTransition(commit);
+      pageTransitioning = false;
+    }
+    function transitionPage(commit) {
+      cancelPageTransition();
+      const token = ++fallbackPageToken;
+      const safeCommit = () => { if (token === fallbackPageToken) commit(); };
+      const finish = () => {
+        if (token !== fallbackPageToken) return;
+        fallbackPageAnimations = [];
+        pageTransitioning = false;
+      };
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const mobileSurface = window.matchMedia("(max-width: 600px), (pointer: coarse)").matches;
+      pageTransitioning = true;
+      document.body.classList.remove("view-transitioning");
+      if (document.startViewTransition && !mobileSurface && !reducedMotion) {
+        const transition = document.startViewTransition(safeCommit);
         activePageTransition = transition;
-        transition.finished.finally(() => { if (activePageTransition === transition) activePageTransition = null; });
+        transition.finished.then(finish, finish).finally(() => { if (activePageTransition === transition) activePageTransition = null; });
         return;
       }
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || !document.querySelector("main").animate) {
-        commit();
+      if (reducedMotion || !document.querySelector("main").animate) {
+        safeCommit();
+        finish();
         return;
       }
-      const token = fallbackPageToken;
       const content = document.querySelector("main");
       const header = document.querySelector(".topbar");
-      const exitFrames = [{ opacity: 1, transform: "translateX(0)" }, { opacity: 0, transform: "translateX(-10px)" }];
-      const options = { duration: 140, easing: "ease-in", fill: "forwards" };
+      const exitFrames = [{ opacity: 1, transform: "translate3d(0,0,0)" }, { opacity: 0, transform: "translate3d(-8px,0,0)" }];
+      const options = { duration: 110, easing: "ease-in", fill: "forwards" };
       const outgoing = content.animate(exitFrames, options);
       const outgoingHeader = header.animate(exitFrames, options);
       fallbackPageAnimations = [outgoing, outgoingHeader];
       outgoing.finished.then(() => {
         if (token !== fallbackPageToken) return;
-        commit();
+        safeCommit();
         outgoing.cancel();
         outgoingHeader.cancel();
-        const enterFrames = [{ opacity: 0, transform: "translateX(12px)" }, { opacity: 1, transform: "translateX(0)" }];
-        const enterOptions = { duration: 280, easing: "cubic-bezier(.18,.8,.2,1)" };
+        const enterFrames = [{ opacity: 0, transform: "translate3d(10px,0,0)" }, { opacity: 1, transform: "translate3d(0,0,0)" }];
+        const enterOptions = { duration: 220, easing: "cubic-bezier(.18,.8,.2,1)" };
         const incoming = content.animate(enterFrames, enterOptions);
         const incomingHeader = header.animate(enterFrames, enterOptions);
         fallbackPageAnimations = [incoming, incomingHeader];
-        incoming.finished.then(() => { if (token === fallbackPageToken) fallbackPageAnimations = []; }).catch(() => {});
+        incoming.finished.then(finish, finish);
       }).catch(() => {});
     }
     function refreshPageData(page) {
@@ -605,10 +622,7 @@
       if (nextPage === currentPage) {
         if (pendingPage) {
           pageIntent += 1;
-          fallbackPageToken += 1;
-          activePageTransition?.skipTransition?.();
-          fallbackPageAnimations.forEach(animation => animation.cancel());
-          fallbackPageAnimations = [];
+          cancelPageTransition();
           pendingPage = null;
         }
         return;
@@ -1304,16 +1318,20 @@
       return button;
     }
     function navigate(path, purchaseMode = false) {
-      state.path = [...path];
-      state.purchaseMode = purchaseMode;
-      state.search = "";
-      document.getElementById("search").value = "";
-      history.pushState(
-        { miniApp: true, page: currentPage, path: state.path, purchaseMode },
-        "",
-        location.href
-      );
-      render();
+      if (state.path.length === path.length && state.path.every((part, index) => part === path[index]) && state.purchaseMode === purchaseMode) return;
+      transitionPage(() => {
+        state.path = [...path];
+        state.purchaseMode = purchaseMode;
+        state.search = "";
+        document.getElementById("search").value = "";
+        history.pushState(
+          { miniApp: true, page: currentPage, path: state.path, purchaseMode },
+          "",
+          location.href
+        );
+        render();
+        window.scrollTo({ top: 0, behavior: "instant" });
+      });
     }
 
     history.replaceState(
@@ -1325,13 +1343,15 @@
       const page = event.state?.miniApp ? event.state : {};
       const nextPage = pageForPath(location.pathname);
       const previousPage = currentPage;
+      const nextPath = nextPage === "stock" && Array.isArray(page.path) ? page.path : [];
+      const pathChanged = state.path.length !== nextPath.length || state.path.some((part, index) => part !== nextPath[index]);
       const intent = ++pageIntent;
       pendingPage = nextPage;
       const commit = () => {
         if (intent !== pageIntent) return;
         pendingPage = null;
         currentPage = nextPage;
-        state.path = nextPage === "stock" && Array.isArray(page.path) ? [...page.path] : [];
+        state.path = [...nextPath];
         state.purchaseMode = nextPage !== "stock";
         state.purchaseView = nextPage === "stock" ? "popular" : nextPage;
         state.search = "";
@@ -1339,17 +1359,21 @@
         document.querySelector(".store").textContent = pageNames[nextPage];
         document.title = `Paradise — ${pageNames[nextPage]}`;
         render();
+        if (pathChanged) window.scrollTo({ top: 0, behavior: "instant" });
         if (previousPage !== nextPage) refreshPageData(nextPage);
       };
-      if (previousPage !== nextPage) transitionPage(commit);
+      if (previousPage !== nextPage || pathChanged) transitionPage(commit);
       else commit();
     });
 
     function goBackFromGesture() {
       if (state.search) {
-        state.search = "";
-        document.getElementById("search").value = "";
-        render();
+        transitionPage(() => {
+          state.search = "";
+          document.getElementById("search").value = "";
+          render();
+          window.scrollTo({ top: 0, behavior: "instant" });
+        });
         return true;
       }
       if (state.purchaseMode && (state.purchaseView === "orders" || state.purchaseView === "analysis")) {
@@ -1725,7 +1749,7 @@
       const viewKey = state.purchaseMode
         ? `purchase:${state.purchaseView}:${state.purchaseView === "popular" ? `${state.purchasePeriod}:${state.purchaseLoading}` : ""}`
         : `stock:${state.stockMode}:${state.search.trim() ? "search" : state.path.join("/")}:${inventoryStatus}`;
-      if (document.body.dataset.viewKey && document.body.dataset.viewKey !== viewKey) {
+      if (!pageTransitioning && document.body.dataset.viewKey && document.body.dataset.viewKey !== viewKey) {
         document.body.classList.remove("view-transitioning");
         void document.body.offsetWidth;
         document.body.classList.add("view-transitioning");
@@ -2305,21 +2329,22 @@
     });
     document.querySelectorAll(".stock-filter").forEach(button => button.addEventListener("click", () => {
       if (state.stockMode === button.dataset.stockMode) return;
-      state.stockMode = button.dataset.stockMode;
-      state.path = [];
-      state.search = "";
-      document.getElementById("search").value = "";
-      loadLiveInventory();
+      transitionPage(() => {
+        state.stockMode = button.dataset.stockMode;
+        state.path = [];
+        state.search = "";
+        document.getElementById("search").value = "";
+        loadLiveInventory();
+        window.scrollTo({ top: 0, behavior: "instant" });
+      });
     }));
-async function selectPurchasePeriod(period) {
+function selectPurchasePeriod(period) {
   document.getElementById("period-menu").hidden = true;
   document.getElementById("period-trigger").setAttribute("aria-expanded", "false");
-  try {
-    await loadPurchaseGoods(period);
-    render();
-  } catch (error) {
-    console.error("Не удалось загрузить популярные товары:", error);
-  }
+  transitionPage(() => {
+    loadPurchaseGoods(period).catch(error => console.error("Не удалось загрузить популярные товары:", error));
+    window.scrollTo({ top: 0, behavior: "instant" });
+  });
 }
 
 document.getElementById("period-trigger").addEventListener("click", () => {
