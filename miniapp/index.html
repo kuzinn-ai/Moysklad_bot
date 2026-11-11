@@ -591,6 +591,16 @@
       }
       const content = document.querySelector("main");
       const header = document.querySelector(".topbar");
+      if (mobileSurface) {
+        safeCommit();
+        const enterFrames = [{ opacity: .65, transform: "translate3d(6px,0,0)" }, { opacity: 1, transform: "translate3d(0,0,0)" }];
+        const options = { duration: 180, easing: "cubic-bezier(.18,.8,.2,1)" };
+        const incoming = content.animate(enterFrames, options);
+        const incomingHeader = header.animate(enterFrames, options);
+        fallbackPageAnimations = [incoming, incomingHeader];
+        incoming.finished.then(finish, finish);
+        return;
+      }
       const exitFrames = [{ opacity: 1, transform: "translate3d(0,0,0)" }, { opacity: 0, transform: "translate3d(-8px,0,0)" }];
       const options = { duration: 110, easing: "ease-in", fill: "forwards" };
       const outgoing = content.animate(exitFrames, options);
@@ -1813,6 +1823,7 @@
       notice.hidden = inventoryStatus === "live" || isPurchase;
       if (inventoryStatus === "demo") notice.textContent = "Макет: демонстрационные данные, подключение к МоемуСкладу ещё не настроено.";
       if (inventoryStatus === "loading") notice.textContent = "Загружаем категории и остатки из МоегоСклада…";
+      if (inventoryStatus === "unauthorized") notice.textContent = "Доступ к остаткам не подтверждён. Откройте Paradise из Telegram на этом устройстве и обновите приложение.";
       if (inventoryStatus === "error") notice.textContent = "Не удалось получить остатки. Откройте приложение из Telegram и проверьте соединение.";
       const regularItems = state.purchase.filter(item => purchaseQuantity(item) > 0);
       const pricedItems = regularItems.filter(item => Number.isFinite(Number(item.purchasePrice)) && item.purchasePrice !== null && item.purchasePrice !== "");
@@ -2256,6 +2267,13 @@
           headers,
           cache: "no-store"
         });
+        if (requestId !== stockRequestId) return;
+        if (response.status === 401) {
+          inventory = {};
+          inventoryStatus = "unauthorized";
+          render();
+          return;
+        }
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const loaded = convertStockTree(await response.json());
         if (requestId !== stockRequestId) return;
