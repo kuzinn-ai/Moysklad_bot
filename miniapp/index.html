@@ -1947,10 +1947,10 @@
             sales.textContent = `Продано за ${periodName}: ${product.quantity} шт. · в чеках: ${product.checks}`;
             card.append(sales);
             const added = state.purchase.some(item => item.product.name === product.name);
-            const add = makeButton(added ? "Увеличь количество в черновике" : "＋ Добавить в черновик", () => {
+            const add = makeButton(added ? "＋ Ещё 1 шт. в закупку" : "＋ Добавить в черновик", () => {
               addToPurchase(product);
               render();
-            }, "add-button");
+            }, `add-button${added ? " added" : ""}`);
             card.append(add);
           } else {
             const added = state.purchase.some(item => item.product.name === product.name);
