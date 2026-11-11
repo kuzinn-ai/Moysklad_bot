@@ -31,18 +31,24 @@
     }
     button, input { font: inherit; }
     .topbar { padding: calc(14px + env(safe-area-inset-top)) 18px 12px; }
-    .brandline { display: flex; align-items: center; justify-content: space-between; }
     .brand { font-size: 13px; font-weight: 700; letter-spacing: .12em; color: var(--muted); text-transform: uppercase; }
     .store { margin-top: 2px; font-size: 24px; font-weight: 750; letter-spacing: -.04em; }
-    .store-chip { background: var(--green-soft); color: var(--green); border-radius: 20px; padding: 7px 11px; font-size: 12px; font-weight: 700; }
     main { padding: 0 16px; max-width: 680px; margin: 0 auto; touch-action: pan-y; }
     .searchbox { position: sticky; top: 0; z-index: 3; padding: 4px 0 12px; background: var(--bg); }
     .search { width: 100%; height: 48px; border: 1px solid var(--line); border-radius: 15px; background: var(--card); padding: 0 15px 0 43px; color: var(--text); outline: none; box-shadow: var(--shadow); }
     .search:focus { border-color: var(--accent); }
-    .search-icon { position: absolute; left: 15px; top: 17px; color: var(--muted); font-size: 19px; pointer-events: none; }
+    .search-icon { position: absolute; left: 15px; top: 17px; width: 20px; height: 20px; color: var(--muted); pointer-events: none; }
+    .search-icon svg { display: block; width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
     .stock-filters { display: flex; gap: 7px; margin: 0 0 14px; }
     .stock-filter { flex: 1; min-width: 0; min-height: 38px; padding: 5px; border: 1px solid var(--line); border-radius: 11px; background: var(--card); color: var(--muted); font-size: 13px; font-weight: 650; cursor: pointer; }
     .stock-filter.active { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+    .stock-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; margin: 0 0 20px; }
+    .stock-summary-card { position: relative; min-width: 0; min-height: 106px; padding: 16px; overflow: hidden; border: 1px solid var(--line); border-radius: 17px; background: var(--card); box-shadow: var(--shadow); }
+    .stock-summary-card.featured { background: var(--text); color: var(--bg); border-color: transparent; }
+    .stock-summary-label { display: block; position: relative; z-index: 1; font-size: 12px; color: var(--muted); }
+    .stock-summary-card.featured .stock-summary-label { color: color-mix(in srgb, var(--bg) 68%, transparent); }
+    .stock-summary-value { display: block; position: relative; z-index: 1; margin-top: 8px; font-size: clamp(23px, 6vw, 30px); font-weight: 750; line-height: 1; letter-spacing: -.055em; font-variant-numeric: tabular-nums; }
+    .stock-summary-card.featured::after { content: ""; position: absolute; width: 90px; height: 90px; right: -23px; bottom: -40px; border: 16px solid color-mix(in srgb, var(--bg) 12%, transparent); border-radius: 50%; }
     .stock.zero { color: var(--muted); background: var(--bg); }
     .stock.negative { color: #b73429; background: #fdecea; }
     .heading { display: flex; justify-content: space-between; align-items: end; margin: 8px 2px 12px; }
@@ -57,11 +63,12 @@
     .crumbs button { border: 0; padding: 0; background: none; color: var(--accent); cursor: pointer; }
     .group-list, .product-list { display: grid; gap: 9px; }
     .group-card { border: 1px solid var(--line); border-radius: 17px; background: var(--card); padding: 15px; display: flex; align-items: center; gap: 13px; text-align: left; width: 100%; box-shadow: var(--shadow); cursor: pointer; color: inherit; }
-    .group-icon { width: 42px; height: 42px; display: grid; place-items: center; flex: none; border-radius: 13px; background: var(--accent-soft); color: var(--accent); font-size: 20px; }
+    .group-icon { width: 42px; height: 42px; display: grid; place-items: center; flex: none; border-radius: 13px; background: var(--accent-soft); color: var(--accent); }
+    .group-icon svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
     .group-copy { flex: 1; min-width: 0; }
     .group-name { display: block; font-weight: 700; }
     .group-meta { display: block; color: var(--muted); font-size: 13px; margin-top: 3px; }
-    .chevron { color: #9aa6b2; font-size: 20px; }
+    .chevron { width: 9px; height: 9px; flex: none; border-top: 1.8px solid currentColor; border-right: 1.8px solid currentColor; color: var(--muted); transform: rotate(45deg); }
     .product-card { background: var(--card); border: 1px solid var(--line); border-radius: 17px; padding: 15px; box-shadow: var(--shadow); display: flex; flex-direction: column; }
     .product-name { font-weight: 650; line-height: 1.35; min-height: 2.7em; }
     .product-info { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 11px 0 13px; }
@@ -91,16 +98,35 @@
     .analysis-actions { display: flex; flex-wrap: wrap; gap: 8px; }
     .analysis-actions button { flex: 1 1 130px; }
     .analysis-card-head { display: flex; justify-content: space-between; gap: 10px; font-weight: 700; }
+    .analysis-overview { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+    .analysis-metric { min-width: 0; padding: 17px; border: 1px solid var(--line); border-radius: 17px; background: var(--card); box-shadow: var(--shadow); }
+    .analysis-metric:first-child { background: var(--text); color: var(--bg); border-color: transparent; }
+    .analysis-metric-label { display: block; color: var(--muted); font-size: 12px; }
+    .analysis-metric:first-child .analysis-metric-label { color: color-mix(in srgb, var(--bg) 68%, transparent); }
+    .analysis-metric-value { display: block; margin-top: 8px; font-size: clamp(21px, 5vw, 28px); font-weight: 750; line-height: 1.1; letter-spacing: -.045em; font-variant-numeric: tabular-nums; }
     .analysis-class { color: var(--accent); white-space: nowrap; }
     .analysis-update { min-height: 40px; border: 0; border-radius: 10px; background: var(--accent); color: white; font-weight: 700; }
     .orders-panel { display: grid; gap: 12px; }
     .order-form, .customer-order { padding: 15px; border: 1px solid var(--line); border-radius: 16px; background: var(--card); box-shadow: var(--shadow); }
     .order-form { display: grid; gap: 10px; }
     .order-form-title { font-size: 17px; font-weight: 750; }
+    .order-form-intro { margin: -4px 0 3px; color: var(--muted); font-size: 13px; }
     .order-field { width: 100%; min-height: 42px; border: 1px solid var(--line); border-radius: 11px; padding: 9px 11px; background: var(--bg); color: var(--text); }
+    .order-field, .budget-input, .purchase-price-input, .analysis-dates input, .analysis-controls input, .analysis-controls select { outline: none; transition: border-color .18s ease, box-shadow .18s ease; }
+    .order-field:focus, .budget-input:focus, .purchase-price-input:focus, .analysis-dates input:focus, .analysis-controls input:focus, .analysis-controls select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 9%, transparent); }
     .order-field[type="number"] { appearance: textfield; -moz-appearance: textfield; }
     .order-field[type="number"]::-webkit-inner-spin-button, .order-field[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     .order-field-note { min-height: 76px; resize: vertical; }
+    .photo-upload { position: relative; display: flex; align-items: center; gap: 12px; min-height: 68px; padding: 12px 14px; border: 1px dashed var(--line); border-radius: 13px; background: var(--bg); cursor: pointer; transition: border-color .2s ease, background .2s ease, transform .2s ease; }
+    .photo-upload:hover, .photo-upload:focus-within { border-color: var(--accent); }
+    .photo-upload:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .photo-upload:active { transform: scale(.99); }
+    .photo-upload-icon { display: grid; place-items: center; flex: none; width: 38px; height: 38px; border-radius: 11px; background: var(--card); color: var(--text); font-size: 24px; line-height: 1; }
+    .photo-upload-copy { display: grid; min-width: 0; gap: 2px; }
+    .photo-upload-title { font-size: 14px; font-weight: 700; }
+    .photo-upload-status { color: var(--muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .photo-upload.has-file { border-style: solid; border-color: var(--green); background: var(--green-soft); }
+    .photo-upload input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
     .order-submit { min-height: 44px; border: 0; border-radius: 12px; background: var(--accent); color: white; font-weight: 700; cursor: pointer; }
     .customer-orders-list { display: grid; gap: 9px; }
     .customer-order-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
@@ -172,19 +198,210 @@
       .analysis-dates { grid-template-columns: 1fr; }
       .analysis-dates label { width: min(100%, 260px); }
     }
+    /* Quiet dashboard styling shared by the existing Mini App views. */
+    :root {
+      --bg: #f2f3f0;
+      --card: #fff;
+      --text: #171b19;
+      --muted: #737b76;
+      --line: #e3e7e2;
+      --accent: #171d19;
+      --accent-soft: #e8ece8;
+      --green: #167b62;
+      --green-soft: #ddf3e9;
+      --shadow: 0 10px 28px rgba(19, 30, 23, .045);
+    }
+    body {
+      color-scheme: light;
+      background: var(--bg);
+      font-size: 15px;
+      -webkit-font-smoothing: antialiased;
+    }
+    body[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #101411;
+      --card: #1b211d;
+      --text: #f3f5f1;
+      --muted: #a2ada4;
+      --line: #303a32;
+      --accent: #eaf2e9;
+      --accent-soft: #303c33;
+      --green: #8fe2bf;
+      --green-soft: #203b30;
+      --shadow: 0 12px 30px rgba(0, 0, 0, .12);
+    }
+    .topbar, main { max-width: 712px; margin-left: auto; margin-right: auto; }
+    .topbar { padding: calc(24px + env(safe-area-inset-top)) 20px 20px; }
+    .brand { color: var(--muted); letter-spacing: .1em; font-size: 11px; }
+    .store { margin-top: 6px; font-size: clamp(24px, 6vw, 32px); line-height: 1.1; letter-spacing: -.055em; }
+    main { padding: 0 20px; }
+    .searchbox { padding: 4px 0 13px; }
+    .search { height: 50px; border-radius: 16px; box-shadow: none; transition: border-color .2s ease, box-shadow .2s ease, background .2s ease; }
+    .search:focus { box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 9%, transparent); }
+    .search-icon { top: 18px; }
+    .stock-filters, .purchase-view-tabs { gap: 4px; padding: 4px; border-radius: 15px; background: var(--accent-soft); }
+    .stock-filters { position: relative; margin-bottom: 18px; }
+    .stock-filters::before { content: ""; position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc((100% - 16px) / 3); border-radius: 11px; background: var(--card); box-shadow: 0 3px 10px rgba(0,0,0,.07); transition: transform .3s cubic-bezier(.2,.8,.2,1); }
+    .stock-filters[data-mode="zero"]::before { transform: translateX(calc(100% + 4px)); }
+    .stock-filters[data-mode="negative"]::before { transform: translateX(calc(200% + 8px)); }
+    .purchase-view-tabs { justify-content: stretch; margin: 4px 0 18px; }
+    .stock-filter, .purchase-view-tab { border: 0; border-radius: 11px; background: transparent; color: var(--muted); box-shadow: none; transition: background .22s ease, color .22s ease, box-shadow .22s ease, transform .22s ease; }
+    .stock-filter { position: relative; z-index: 1; }
+    .purchase-view-tab { flex: 1; padding: 0 9px; font-size: 12px; }
+    .stock-filter.active { background: transparent; color: var(--text); box-shadow: none; }
+    .purchase-view-tab.active { background: var(--card); color: var(--text); box-shadow: 0 3px 10px rgba(0,0,0,.07); }
+    .heading { align-items: center; margin: 8px 2px 15px; }
+    h1 { font-size: clamp(21px, 5vw, 27px); font-weight: 750; letter-spacing: -.045em; }
+    .subheading { margin-top: 6px; }
+    .back-button { color: var(--text); border-radius: 12px; transition: transform .18s ease, background .18s ease; }
+    .crumbs { margin-bottom: 14px; }
+    .crumbs button { color: var(--text); font-weight: 650; }
+    .group-list, .product-list, .orders-panel, .analysis-panel { gap: 11px; }
+    .group-card, .product-card, .purchase-summary, .analysis-toolbar, .analysis-card, .order-form, .customer-order, .popular-category-empty, .orders-empty, .empty {
+      border-color: var(--line);
+      border-radius: 19px;
+      background: var(--card);
+      box-shadow: var(--shadow);
+    }
+    .group-card { padding: 17px; min-height: 81px; transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease; }
+    .group-icon { background: var(--accent-soft); color: var(--text); border-radius: 13px; }
+    .group-name, .product-name { letter-spacing: -.015em; }
+    .chevron { color: var(--muted); transition: transform .22s ease; }
+    .group-card:active { transform: scale(.985); }
+    .group-card:active .chevron { transform: translateX(3px) rotate(45deg); }
+    .product-card { padding: 18px; }
+    .price { letter-spacing: -.035em; }
+    .stock { background: var(--green-soft); color: var(--green); }
+    .stock.zero { background: var(--accent-soft); color: var(--muted); }
+    .add-button, .order-submit, .purchase-pdf-button, .analysis-update { border-radius: 12px; background: var(--accent); color: var(--bg); transition: transform .18s ease, opacity .18s ease; }
+    .add-button:active, .order-submit:active, .purchase-pdf-button:active, .analysis-update:active { transform: scale(.985); }
+    .add-button.added { background: var(--green-soft); color: var(--green); }
+    .qty-button, .stepper-button { background: var(--accent-soft); color: var(--text); }
+    .purchase-summary, .analysis-toolbar, .analysis-card, .order-form, .customer-order { padding: 18px; }
+    .section-title, .popular-category-title, .order-form-title { letter-spacing: -.03em; }
+    .period-trigger, .period-menu { border-radius: 13px; box-shadow: var(--shadow); }
+    .period-option[aria-selected="true"], .period-option:hover { background: var(--accent-soft); color: var(--text); }
+    .notice { color: var(--muted); }
+    .bottom-nav { background: color-mix(in srgb, var(--bg) 90%, transparent); border-color: var(--line); }
+    .nav-inner { grid-template-columns: 1fr 1fr; max-width: 680px; gap: 4px; padding: 4px; border: 1px solid var(--line); border-radius: 18px; background: var(--card); box-shadow: 0 8px 28px rgba(0,0,0,.08); }
+    .nav-button { min-height: 44px; border-radius: 14px; font-size: 14px; transition: background .22s ease, color .22s ease, transform .22s ease; }
+    .nav-button.active { background: var(--accent); color: var(--bg); }
+    .nav-button:active { transform: scale(.97); }
+    .badge { background: var(--green); color: #fff; }
+    body[data-theme="dark"] .bottom-nav { background: rgba(16, 20, 17, .9); }
+    body[data-theme="dark"] .empty { background: var(--card); }
+    body[data-theme="dark"] .stock.negative { background: #442825; color: #ffafa7; }
+    @media (hover: hover) {
+      .group-card:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--text) 20%, var(--line)); box-shadow: 0 14px 30px rgba(0,0,0,.09); }
+      .group-card:hover .chevron { transform: translateX(3px) rotate(45deg); }
+    }
+    @keyframes view-enter { from { opacity: 0; } to { opacity: 1; } }
+    .view-transitioning .heading, .view-transitioning .crumbs, .view-transitioning .group-list, .view-transitioning .product-list, .view-transitioning .purchase-recommendations, .view-transitioning #purchase-draft, .view-transitioning .analysis-panel, .view-transitioning .orders-panel {
+      animation: view-enter .28s ease both;
+    }
+    #analysis-list .analysis-card { animation: view-enter .28s ease both; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-delay: 0ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+    }
+    @view-transition { navigation: auto; }
+    ::view-transition-old(root) { animation: .25s cubic-bezier(.4,0,1,1) both page-out; }
+    ::view-transition-new(root) { animation: .38s cubic-bezier(.18,.8,.2,1) both page-in; }
+    ::view-transition-old(app-nav), ::view-transition-new(app-nav) { animation: none; }
+    @keyframes page-out { to { opacity: 0; transform: translateX(-10px) scale(.99); } }
+    @keyframes page-in { from { opacity: 0; transform: translateX(14px) scale(.99); } }
+    .bottom-nav { view-transition-name: app-nav; }
+    @media (prefers-reduced-motion: reduce) {
+      ::view-transition-old(root), ::view-transition-new(root) { animation-duration: .01ms; }
+    }
+    .purchase-view-tabs { display: none; }
+    .nav-inner { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .nav-inner { position: relative; }
+    .nav-inner::before { content: ""; position: absolute; z-index: 0; top: 4px; bottom: 4px; left: 4px; width: calc((100% - 20px) / 4); border-radius: 14px; background: var(--accent); transition: transform .34s cubic-bezier(.2,.8,.2,1); }
+    .nav-inner[data-active="1"]::before { transform: translateX(calc(100% + 4px)); }
+    .nav-inner[data-active="2"]::before { transform: translateX(calc(200% + 8px)); }
+    .nav-inner[data-active="3"]::before { transform: translateX(calc(300% + 12px)); }
+    .nav-button { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 6px; min-width: 0; padding: 0 3px; font-size: 12px; text-decoration: none; text-align: center; }
+    .nav-button.active { background: transparent; color: var(--bg); }
+    .nav-button .badge { margin-left: 0; }
+    .nav-icon { width: 17px; height: 17px; flex: none; stroke: currentColor; stroke-width: 1.8; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .nav-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .back-button:disabled { display: none; }
+    .nav-button:focus-visible, .stock-filter:focus-visible, .group-card:focus-visible, .back-button:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
+    body:not([data-page="stock"]) .topbar { padding-bottom: 4px; }
+    body:not([data-page="stock"]) .topbar .store { display: none; }
+    .order-form { gap: 14px; }
+    .order-form-title { margin: 0; font-size: 19px; line-height: 1.2; }
+    .order-form-intro { margin: -8px 0 2px; }
+    .order-fields-primary, .order-fields-secondary { display: grid; gap: 10px; }
+    .order-fields-primary { grid-template-columns: minmax(0, 1fr) 116px; }
+    .order-fields-secondary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .order-field-group { display: grid; min-width: 0; gap: 6px; color: var(--text); font-size: 12px; font-weight: 700; }
+    .order-field-label { display: block; }
+    .order-field-group .optional { color: var(--muted); font-weight: 500; }
+    .order-field { min-height: 46px; }
+    .order-field-note { min-height: 86px; }
+    .orders-list-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin: 12px 2px 2px; }
+    .orders-list-head h2 { margin: 0; font-size: 18px; letter-spacing: -.03em; }
+    .orders-list-count { color: var(--muted); font-size: 13px; }
+    .analysis-footer-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .analysis-footer-actions .analysis-update { min-height: 44px; }
+    .analysis-footer-actions #analysis-export { border: 1px solid var(--line); background: var(--card); color: var(--text); }
+    .analysis-footer-actions #analysis-export:disabled { opacity: .48; }
+    .recommendation-header { display: flex; align-items: end; justify-content: space-between; gap: 14px; margin: 27px 2px 15px; }
+    .recommendation-header h2 { margin: 0; font-size: 20px; letter-spacing: -.035em; }
+    .recommendation-header p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+    #purchase-period { margin: 0; flex: none; font-size: 12px; }
+    .period-trigger { min-height: 42px; }
+    .purchase-summary .section-title { font-size: 19px; }
+    .purchase-summary .group-meta { line-height: 1.5; }
+    .purchase-empty, .popular-empty { display: grid; justify-items: start; gap: 5px; padding: 20px; border: 1px dashed var(--line); border-radius: 15px; background: var(--bg); }
+    .purchase-empty { margin-top: 15px; }
+    .purchase-empty strong, .popular-empty strong { font-size: 15px; }
+    .purchase-empty p, .popular-empty p { margin: 0; color: var(--muted); font-size: 13px; }
+    .empty-action { min-height: 40px; margin-top: 8px; padding: 0 13px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--text); font-weight: 700; cursor: pointer; }
+    .empty-action:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+    .popular-category-title { font-size: 16px; }
+    .purchase-total { justify-content: flex-start; align-items: center; flex-wrap: wrap; gap: 6px; }
+    .purchase-total-main { margin-right: 3px; }
+    .purchase-total-detail { padding: 5px 8px; border-radius: 8px; background: var(--bg); color: var(--muted); font-size: 12px; font-weight: 650; }
+    .purchase-line { align-items: flex-start; }
+    .purchase-line-controls { align-self: center; }
+    .search-empty { display: grid; justify-items: start; gap: 5px; text-align: left; }
+    .search-empty strong { color: var(--text); font-size: 15px; }
+    .search-empty p { margin: 0; font-size: 13px; }
+    @media (max-width: 520px) {
+      .recommendation-header { display: grid; gap: 10px; }
+      #purchase-period { justify-content: space-between; }
+      .purchase-line { display: grid; gap: 12px; }
+      .purchase-line-controls { width: 100%; justify-content: space-between; }
+      .purchase-price-editor { display: grid; justify-items: start; gap: 5px; }
+      .purchase-price-input { width: min(100%, 180px); }
+      .purchase-total { align-items: flex-start; }
+    }
+    @media (max-width: 540px) { .order-fields-secondary { grid-template-columns: 1fr; } }
+    @media (max-width: 360px) { .order-fields-primary { grid-template-columns: 1fr; } }
+    @media (max-width: 520px) {
+      body { padding-bottom: calc(94px + env(safe-area-inset-bottom)); }
+      .bottom-nav { padding: 8px 12px calc(8px + env(safe-area-inset-bottom)); background: transparent; border: 0; }
+      .nav-inner { border-radius: 22px; padding: 5px; gap: 4px; box-shadow: 0 14px 34px rgba(10,20,13,.16); }
+      .nav-inner::before { top: 5px; bottom: 5px; left: 5px; width: calc((100% - 22px) / 4); border-radius: 17px; }
+      .nav-button { min-height: 56px; flex-direction: column; gap: 2px; font-size: 11px; line-height: 1.05; }
+      .nav-icon { width: 19px; height: 19px; }
+      .nav-button .badge { position: absolute; right: 6px; top: 3px; }
+    }
+    @media (max-width: 420px) { .stock-summary-card { min-height: 96px; padding: 12px; } .stock-summary-label { font-size: 11px; } }
+    @media (max-width: 360px) { .nav-button { font-size: 10px; } }
   </style>
 </head>
 <body>
   <header class="topbar">
-    <div class="brandline">
-      <div><div class="brand">Paradise</div><div class="store">Товары на складе</div></div>
-      <div class="store-chip">● Paradise</div>
-    </div>
+    <div class="brand">Paradise</div>
+    <div class="store">Товары на складе</div>
   </header>
 
   <main>
     <div class="searchbox">
-      <span class="search-icon">⌕</span>
+      <span class="search-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.5"/><path d="m16 16 4.2 4.2"/></svg></span>
       <input class="search" id="search" type="search" placeholder="Найти товар" autocomplete="off" aria-label="Найти товар">
     </div>
     <div class="stock-filters" id="stock-filters" role="group" aria-label="Фильтр по остатку">
@@ -192,18 +409,11 @@
       <button class="stock-filter" type="button" data-stock-mode="zero" aria-pressed="false">Нулевые</button>
       <button class="stock-filter" type="button" data-stock-mode="negative" aria-pressed="false">Минусовые</button>
     </div>
-    <div id="purchase-period" hidden>
-      <span>Популярные продажи за период</span>
-      <div class="period-picker">
-        <button class="period-trigger" id="period-trigger" type="button" aria-haspopup="listbox" aria-controls="period-menu" aria-expanded="false">
-          <span id="period-label">За неделю</span><span class="period-chevron" aria-hidden="true"></span>
-        </button>
-        <div class="period-menu" id="period-menu" role="listbox" aria-label="Период продаж" hidden>
-          <button class="period-option" type="button" role="option" data-period="week" aria-selected="true">За неделю</button>
-          <button class="period-option" type="button" role="option" data-period="month" aria-selected="false">За месяц</button>
-        </div>
-      </div>
-    </div>
+    <section class="stock-summary" id="stock-summary" aria-label="Сводка по остатку" hidden>
+      <div class="stock-summary-card featured"><span class="stock-summary-label" id="summary-stock-label">В наличии</span><strong class="stock-summary-value" id="summary-stock-value">0</strong></div>
+      <div class="stock-summary-card"><span class="stock-summary-label">Товары</span><strong class="stock-summary-value" id="summary-products-value">0</strong></div>
+      <div class="stock-summary-card"><span class="stock-summary-label">Категории</span><strong class="stock-summary-value" id="summary-categories-value">0</strong></div>
+    </section>
     <div class="purchase-view-tabs" id="purchase-view-tabs" hidden>
       <button class="purchase-view-tab" id="orders-view-tab" type="button">Заказы покупателей</button>
       <button class="purchase-view-tab" id="analysis-view-tab" type="button">ABC‑XYZ</button>
@@ -215,21 +425,45 @@
     <nav class="crumbs" id="crumbs" aria-label="Путь по категориям"></nav>
     <section class="group-list" id="groups"></section>
     <section id="purchase-draft" hidden></section>
-    <div id="recommendation-title" class="section-title" hidden>Популярные продажи — можно добавить в закупку</div>
+    <div class="recommendation-header" id="purchase-recommendation-header" hidden>
+      <div><h2 id="recommendation-title">Популярные продажи</h2><p>Эти товары можно добавить в черновик закупки.</p></div>
+      <div id="purchase-period">
+        <span>Период</span>
+        <div class="period-picker">
+          <button class="period-trigger" id="period-trigger" type="button" aria-haspopup="listbox" aria-controls="period-menu" aria-expanded="false">
+            <span id="period-label">За неделю</span><span class="period-chevron" aria-hidden="true"></span>
+          </button>
+          <div class="period-menu" id="period-menu" role="listbox" aria-label="Период продаж" hidden>
+            <button class="period-option" type="button" role="option" data-period="week" aria-selected="true">За неделю</button>
+            <button class="period-option" type="button" role="option" data-period="month" aria-selected="false">За месяц</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <section class="product-list" id="products" hidden></section>
     <section class="analysis-panel" id="analysis-panel" hidden></section>
     <section class="orders-panel" id="customer-orders-panel" hidden>
       <form class="order-form" id="customer-order-form">
-        <div class="order-form-title">Новый заказ покупателя</div>
-        <input class="order-field" name="product_name" maxlength="300" placeholder="Что попросили привезти? *" required>
-        <input class="order-field" name="quantity" type="number" min="1" max="999" step="1" value="1" inputmode="numeric" aria-label="Количество">
-        <input class="order-field" name="customer_name" maxlength="100" placeholder="Имя покупателя (необязательно)">
-        <input class="order-field" name="contact" maxlength="100" placeholder="Телефон или Telegram (необязательно)">
-        <textarea class="order-field order-field-note" name="note" maxlength="1000" placeholder="Вкус, модель, допустимая замена и другие детали"></textarea>
-        <input class="order-field" name="photo" type="file" accept="image/jpeg,image/png,image/webp" aria-label="Фото товара (необязательно)">
+        <h2 class="order-form-title">Новый заказ</h2>
+        <div class="order-form-intro">Запишите запрос, чтобы сохранить товар и важные детали.</div>
+        <div class="order-fields-primary">
+          <label class="order-field-group"><span class="order-field-label">Товар *</span><input class="order-field" name="product_name" maxlength="300" placeholder="Что привезти?" required></label>
+          <label class="order-field-group"><span class="order-field-label">Количество</span><input class="order-field" name="quantity" type="number" min="1" max="999" step="1" value="1" inputmode="numeric"></label>
+        </div>
+        <div class="order-fields-secondary">
+          <label class="order-field-group"><span class="order-field-label">Покупатель <span class="optional">· необязательно</span></span><input class="order-field" name="customer_name" maxlength="100" placeholder="Имя"></label>
+          <label class="order-field-group"><span class="order-field-label">Контакт <span class="optional">· необязательно</span></span><input class="order-field" name="contact" maxlength="100" placeholder="Телефон или Telegram"></label>
+        </div>
+        <label class="order-field-group"><span class="order-field-label">Детали заказа <span class="optional">· необязательно</span></span><textarea class="order-field order-field-note" name="note" maxlength="1000" placeholder="Вкус, модель, допустимая замена…"></textarea></label>
+        <label class="photo-upload" id="photo-upload">
+          <span class="photo-upload-icon" aria-hidden="true">＋</span>
+          <span class="photo-upload-copy"><span class="photo-upload-title">Прикрепить фото товара</span><span class="photo-upload-status" id="photo-upload-status" aria-live="polite">JPEG, PNG или WebP · до 5 МБ</span></span>
+          <input id="order-photo" name="photo" type="file" accept="image/jpeg,image/png,image/webp" aria-label="Прикрепить фото товара">
+        </label>
         <button class="order-submit" type="submit">Сохранить заказ</button>
         <div class="group-meta" id="order-form-feedback" aria-live="polite"></div>
       </form>
+      <div class="orders-list-head"><h2>Сохранённые заказы</h2><span class="orders-list-count" id="orders-list-count"></span></div>
       <div class="customer-orders-list" id="customer-orders-list"></div>
     </section>
     <div class="notice" id="notice">Макет: демонстрационные данные, подключение к МоемуСкладу ещё не настроено.</div>
@@ -237,8 +471,10 @@
 
   <footer class="bottom-nav">
     <div class="nav-inner">
-      <button class="nav-button active" id="stock-tab">Остатки</button>
-      <button class="nav-button" id="purchase-tab">Закупка <span class="badge" id="purchase-count" hidden>0</span></button>
+      <a class="nav-button active" id="stock-tab" href="/"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 13h3M8 17h3M15 13h2M15 17h2"/></svg><span class="nav-label">Остатки</span></a>
+      <a class="nav-button" id="purchase-tab" href="/purchase"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16l-1.5 14h-13L4 7ZM8 9V6a4 4 0 0 1 8 0v3"/></svg><span class="nav-label">Закупка</span><span class="badge" id="purchase-count" hidden>0</span></a>
+      <a class="nav-button" id="orders-tab" href="/orders"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg><span class="nav-label">Заказы</span></a>
+      <a class="nav-button" id="analysis-tab" href="/analysis"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V12M10 20V5M16 20v-8M22 20V8M2 20h22"/></svg><span class="nav-label">ABC‑XYZ</span></a>
     </div>
   </footer>
 
@@ -275,8 +511,113 @@
 
     const tg = window.Telegram?.WebApp;
     const showDemo = new URLSearchParams(window.location.search).get("demo") === "1";
+    const pageForPath = path => ({ "/purchase": "popular", "/orders": "orders", "/analysis": "analysis" })[path] || "stock";
+    let currentPage = pageForPath(location.pathname);
+    const pageNames = { stock: "Товары на складе", popular: "Закупка", orders: "Заказы покупателей", analysis: "ABC‑XYZ анализ" };
+    document.querySelector(".store").textContent = pageNames[currentPage];
+    document.title = `Paradise — ${pageNames[currentPage]}`;
+    let incomingNavIndex = null;
+    try {
+      incomingNavIndex = sessionStorage.getItem("paradise-nav-from");
+      sessionStorage.removeItem("paradise-nav-from");
+    } catch (_) { /* Private browsing may block session storage. */ }
+    if (showDemo) document.querySelectorAll(".nav-button[href]").forEach(link => { link.search = "?demo=1"; });
+    let activePageTransition = null;
+    let fallbackPageAnimations = [];
+    let fallbackPageToken = 0;
+    let pageIntent = 0;
+    let pendingPage = null;
+    function transitionPage(commit) {
+      activePageTransition?.skipTransition?.();
+      fallbackPageToken += 1;
+      fallbackPageAnimations.forEach(animation => animation.cancel());
+      fallbackPageAnimations = [];
+      if (document.startViewTransition && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        const transition = document.startViewTransition(commit);
+        activePageTransition = transition;
+        transition.finished.finally(() => { if (activePageTransition === transition) activePageTransition = null; });
+        return;
+      }
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || !document.querySelector("main").animate) {
+        commit();
+        return;
+      }
+      const token = fallbackPageToken;
+      const content = document.querySelector("main");
+      const header = document.querySelector(".topbar");
+      const exitFrames = [{ opacity: 1, transform: "translateX(0)" }, { opacity: 0, transform: "translateX(-10px)" }];
+      const options = { duration: 140, easing: "ease-in", fill: "forwards" };
+      const outgoing = content.animate(exitFrames, options);
+      const outgoingHeader = header.animate(exitFrames, options);
+      fallbackPageAnimations = [outgoing, outgoingHeader];
+      outgoing.finished.then(() => {
+        if (token !== fallbackPageToken) return;
+        commit();
+        outgoing.cancel();
+        outgoingHeader.cancel();
+        const enterFrames = [{ opacity: 0, transform: "translateX(12px)" }, { opacity: 1, transform: "translateX(0)" }];
+        const enterOptions = { duration: 280, easing: "cubic-bezier(.18,.8,.2,1)" };
+        const incoming = content.animate(enterFrames, enterOptions);
+        const incomingHeader = header.animate(enterFrames, enterOptions);
+        fallbackPageAnimations = [incoming, incomingHeader];
+        incoming.finished.then(() => { if (token === fallbackPageToken) fallbackPageAnimations = []; }).catch(() => {});
+      }).catch(() => {});
+    }
+    function refreshPageData(page) {
+      if (page === "stock") loadLiveInventory();
+      if (page === "popular" && !state.popularGoods.length) loadPurchaseGoods(state.purchasePeriod).catch(error => console.error("Не удалось загрузить популярные товары:", error));
+      if (page === "orders") loadCustomerOrders();
+      if (page === "analysis") loadAnalysis();
+    }
+    function openPage(href) {
+      const url = new URL(href, location.href);
+      if (url.origin !== location.origin) { location.assign(href); return; }
+      const nextPage = pageForPath(url.pathname);
+      if (nextPage === currentPage) {
+        if (pendingPage) {
+          pageIntent += 1;
+          fallbackPageToken += 1;
+          activePageTransition?.skipTransition?.();
+          fallbackPageAnimations.forEach(animation => animation.cancel());
+          fallbackPageAnimations = [];
+          pendingPage = null;
+        }
+        return;
+      }
+      const intent = ++pageIntent;
+      pendingPage = nextPage;
+      const commit = () => {
+        if (intent !== pageIntent) return;
+        pendingPage = null;
+        currentPage = nextPage;
+        state.purchaseMode = nextPage !== "stock";
+        state.purchaseView = nextPage === "stock" ? "popular" : nextPage;
+        state.path = [];
+        state.search = "";
+        document.getElementById("search").value = "";
+        document.querySelector(".store").textContent = pageNames[nextPage];
+        document.title = `Paradise — ${pageNames[nextPage]}`;
+        history.pushState({ miniApp: true, page: nextPage, path: [], purchaseMode: state.purchaseMode }, "", url);
+        render();
+        window.scrollTo({ top: 0, behavior: "instant" });
+        refreshPageData(nextPage);
+      };
+      transitionPage(commit);
+    }
+    document.querySelectorAll(".nav-button[href]").forEach(link => link.addEventListener("click", event => {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      event.preventDefault();
+      openPage(link.href);
+    }));
     tg?.ready();
     tg?.expand();
+    const systemTheme = window.matchMedia("(prefers-color-scheme: dark)");
+    function syncTheme() {
+      document.body.dataset.theme = tg?.colorScheme || (systemTheme.matches ? "dark" : "light");
+    }
+    syncTheme();
+    tg?.onEvent?.("themeChanged", syncTheme);
+    systemTheme.addEventListener?.("change", syncTheme);
 
     let inventory = showDemo ? demoInventory : {};
     const stockInventories = {};
@@ -314,9 +655,9 @@
     }
     const defaultDates = defaultAnalysisDates();
     const state = {
-      path: [], purchase: savedPurchase, purchaseMode: false, search: "", stockMode: "positive",
+      path: [], purchase: savedPurchase, purchaseMode: currentPage !== "stock", search: "", stockMode: "positive",
       popularGoods: [], purchasePeriod: "week", purchaseLoading: false, purchaseError: false,
-      purchaseBudget: savedBudget, purchaseView: "popular", customerOrders: [],
+      purchaseBudget: savedBudget, purchaseView: currentPage === "stock" ? "popular" : currentPage, customerOrders: [],
       customerOrdersLoading: false, customerOrdersError: false,
       analysis: null, analysisLoading: false, analysisError: "", analysisClass: "all", analysisSearch: "", analysisLimit: 100,
       analysisFrom: defaultDates.from, analysisTo: defaultDates.to, analysisExcel: null, analysisExcelLoading: false, analysisExcelError: false
@@ -479,7 +820,7 @@
           loadScript("/assets/pdfmake.min.js")
             .then(() => loadScript("/assets/vfs_fonts.js"))
             .then(() => {
-              if (!window.pdfMake?.createPdf || !window.pdfMake.vfs?.["Roboto-Regular.ttf"]) {
+              if (!window.pdfMake?.createPdf) {
                 throw new Error("Не загрузились шрифты для PDF");
               }
               resolve(window.pdfMake);
@@ -939,7 +1280,7 @@
       state.search = "";
       document.getElementById("search").value = "";
       history.pushState(
-        { miniApp: true, path: state.path, purchaseMode },
+        { miniApp: true, page: currentPage, path: state.path, purchaseMode },
         "",
         location.href
       );
@@ -947,17 +1288,32 @@
     }
 
     history.replaceState(
-      { miniApp: true, path: [], purchaseMode: false },
+      { miniApp: true, page: currentPage, path: [], purchaseMode: currentPage !== "stock" },
       "",
       location.href
     );
     window.addEventListener("popstate", event => {
       const page = event.state?.miniApp ? event.state : {};
-      state.path = Array.isArray(page.path) ? [...page.path] : [];
-      state.purchaseMode = Boolean(page.purchaseMode);
-      state.search = "";
-      document.getElementById("search").value = "";
-      render();
+      const nextPage = pageForPath(location.pathname);
+      const previousPage = currentPage;
+      const intent = ++pageIntent;
+      pendingPage = nextPage;
+      const commit = () => {
+        if (intent !== pageIntent) return;
+        pendingPage = null;
+        currentPage = nextPage;
+        state.path = nextPage === "stock" && Array.isArray(page.path) ? [...page.path] : [];
+        state.purchaseMode = nextPage !== "stock";
+        state.purchaseView = nextPage === "stock" ? "popular" : nextPage;
+        state.search = "";
+        document.getElementById("search").value = "";
+        document.querySelector(".store").textContent = pageNames[nextPage];
+        document.title = `Paradise — ${pageNames[nextPage]}`;
+        render();
+        if (previousPage !== nextPage) refreshPageData(nextPage);
+      };
+      if (previousPage !== nextPage) transitionPage(commit);
+      else commit();
     });
 
     function goBackFromGesture() {
@@ -968,8 +1324,11 @@
         return true;
       }
       if (state.purchaseMode && (state.purchaseView === "orders" || state.purchaseView === "analysis")) {
-        state.purchaseView = "popular";
-        render();
+        openPage(showDemo ? "/purchase?demo=1" : "/purchase");
+        return true;
+      }
+      if (state.purchaseMode) {
+        openPage(showDemo ? "/?demo=1" : "/");
         return true;
       }
       // Keep the gesture inside the Mini App at its home screen.
@@ -1078,7 +1437,7 @@
       const panel = document.getElementById("analysis-panel");
       if (!panel.firstChild) {
         const toolbar = document.createElement("div"); toolbar.className = "analysis-toolbar";
-        const heading = document.createElement("strong"); heading.textContent = "Продажи Paradise · МоегоСклада";
+        const heading = document.createElement("strong"); heading.textContent = "Данные продаж · МойСклад";
         const status = document.createElement("div"); status.className = "group-meta"; status.id = "analysis-status";
         const dates = document.createElement("div"); dates.className = "analysis-dates";
         for (const [key, label] of [["from", "С"], ["to", "По"]]) {
@@ -1122,7 +1481,9 @@
         const exportButton = document.createElement("button"); exportButton.type = "button"; exportButton.className = "analysis-update";
         exportButton.id = "analysis-export"; exportButton.textContent = "Скачать Excel";
         exportButton.addEventListener("click", shareAnalysisExcel);
-        toolbar.append(heading, dates, periodActions, status, controls, update, exportButton);
+        const footerActions = document.createElement("div"); footerActions.className = "analysis-footer-actions";
+        footerActions.append(update, exportButton);
+        toolbar.append(heading, dates, periodActions, status, controls, footerActions);
         const list = document.createElement("div"); list.id = "analysis-list"; list.className = "analysis-panel";
         panel.append(toolbar, list);
       }
@@ -1136,9 +1497,17 @@
       exportButton.textContent = state.analysisExcelLoading ? "Готовим Excel…" : state.analysisExcelError ? "Повторить Excel" : "Скачать Excel";
       const list = document.getElementById("analysis-list"); list.replaceChildren();
       if (!snapshot) return;
-      const summary = document.createElement("div"); summary.className = "analysis-card";
-      summary.textContent = `Выручка: ${new Intl.NumberFormat("ru-RU").format(snapshot.total_revenue)} ₽. A/B/C — вклад в выручку; X/Y/Z — стабильность спроса по неделям. Товары без продаж и с редкими продажами относятся к Z.`;
-      list.append(summary);
+      const overview = document.createElement("div"); overview.className = "analysis-overview";
+      for (const [label, value] of [["Выручка", `${new Intl.NumberFormat("ru-RU").format(snapshot.total_revenue)} ₽`], ["Товаров в анализе", new Intl.NumberFormat("ru-RU").format(snapshot.items.length)]]) {
+        const metric = document.createElement("div"); metric.className = "analysis-metric";
+        const caption = document.createElement("span"); caption.className = "analysis-metric-label"; caption.textContent = label;
+        const number = document.createElement("strong"); number.className = "analysis-metric-value"; number.textContent = value;
+        metric.append(caption, number); overview.append(metric);
+      }
+      list.append(overview);
+      const explanation = document.createElement("div"); explanation.className = "group-meta";
+      explanation.textContent = "A/B/C — вклад в выручку; X/Y/Z — стабильность спроса. Товары без продаж и с редкими продажами относятся к Z.";
+      list.append(explanation);
       const query = state.analysisSearch.trim().toLocaleLowerCase("ru");
       const items = snapshot.items.filter(item => (state.analysisClass === "all" || item.class === state.analysisClass)
         && (!query || item.name.toLocaleLowerCase("ru").includes(query)));
@@ -1228,7 +1597,20 @@
       }
     }
 
+    let viewTransitionTimer;
     function render() {
+      document.body.dataset.page = currentPage;
+      const viewKey = state.purchaseMode
+        ? `purchase:${state.purchaseView}:${state.purchaseView === "popular" ? `${state.purchasePeriod}:${state.purchaseLoading}` : ""}`
+        : `stock:${state.stockMode}:${state.search.trim() ? "search" : state.path.join("/")}:${inventoryStatus}`;
+      if (document.body.dataset.viewKey && document.body.dataset.viewKey !== viewKey) {
+        document.body.classList.remove("view-transitioning");
+        void document.body.offsetWidth;
+        document.body.classList.add("view-transitioning");
+        clearTimeout(viewTransitionTimer);
+        viewTransitionTimer = setTimeout(() => document.body.classList.remove("view-transitioning"), 500);
+      }
+      document.body.dataset.viewKey = viewKey;
       const query = state.search.trim().toLocaleLowerCase("ru");
       const title = document.getElementById("title");
       const subtitle = document.getElementById("subtitle");
@@ -1243,18 +1625,20 @@
       const isPurchase = state.purchaseMode;
       const isOrdersView = isPurchase && state.purchaseView === "orders";
       const isAnalysisView = isPurchase && state.purchaseView === "analysis";
-      document.querySelector(".searchbox").hidden = isAnalysisView;
+      document.querySelector(".searchbox").hidden = isPurchase;
       document.getElementById("stock-filters").hidden = isPurchase;
       document.querySelectorAll(".stock-filter").forEach(button => {
         const active = button.dataset.stockMode === state.stockMode;
         button.classList.toggle("active", active);
         button.setAttribute("aria-pressed", String(active));
       });
+      document.getElementById("stock-filters").dataset.mode = state.stockMode;
       const backButton = document.getElementById("back-button");
       backButton.disabled = !hasBackTarget();
       const showPurchaseRecommendations = isPurchase && !isOrdersView && !isAnalysisView;
       document.getElementById("purchase-period").hidden = !showPurchaseRecommendations;
-      document.getElementById("purchase-view-tabs").hidden = !isPurchase;
+      document.getElementById("purchase-recommendation-header").hidden = !showPurchaseRecommendations;
+      document.getElementById("purchase-view-tabs").hidden = true;
       const ordersViewTab = document.getElementById("orders-view-tab");
       ordersViewTab.textContent = isOrdersView ? "← К популярным товарам" : "Заказы покупателей";
       ordersViewTab.classList.toggle("active", isOrdersView);
@@ -1264,10 +1648,19 @@
       document.querySelectorAll(".period-option").forEach(option => {
         option.setAttribute("aria-selected", String(option.dataset.period === state.purchasePeriod));
       });
-      crumbs.hidden = isPurchase;
+      crumbs.hidden = isPurchase || isSearch;
       const current = getNode(state.path);
       const childEntries = Object.entries(current || inventory).filter(([name]) => name !== "goods");
       const hasChildren = childEntries.length > 0;
+      const stockSummary = document.getElementById("stock-summary");
+      stockSummary.hidden = isPurchase || isSearch || state.path.length > 0 || !["live", "demo"].includes(inventoryStatus);
+      if (!stockSummary.hidden) {
+        const summaryProducts = allProducts(inventory);
+        document.getElementById("summary-stock-label").textContent = state.stockMode === "positive" ? "Штук в наличии" : state.stockMode === "zero" ? "Без остатка" : "С минусом";
+        document.getElementById("summary-stock-value").textContent = new Intl.NumberFormat("ru-RU").format(state.stockMode === "positive" ? summaryProducts.reduce((sum, product) => sum + (Number(product.stock) || 0), 0) : summaryProducts.length);
+        document.getElementById("summary-products-value").textContent = new Intl.NumberFormat("ru-RU").format(summaryProducts.length);
+        document.getElementById("summary-categories-value").textContent = new Intl.NumberFormat("ru-RU").format(childEntries.length);
+      }
       const showProducts = !isAnalysisView && (isSearch || isPurchase || Boolean(current?.goods?.length && !hasChildren));
       title.textContent = isAnalysisView ? "ABC‑XYZ анализ" : isOrdersView ? "Заказы покупателей" : isPurchase ? "Список закупки" : isSearch ? "Результаты поиска" : state.path[state.path.length - 1] || "Категории";
       subtitle.textContent = isAnalysisView ? "Выручка и спрос за выбранный период" : isOrdersView ? "Запросы, принятые в магазине" : isPurchase ? "Черновик, склад не изменяется" : isSearch ? "Поиск по выбранному остатку" : "Остатки из МоегоСклада";
@@ -1292,11 +1685,14 @@
       const products = showPurchaseRecommendations ? state.popularGoods
         : isSearch ? allProducts(inventory).filter(product => product.name.toLocaleLowerCase("ru").includes(query))
         : isOrdersView ? [] : (current?.goods || []).map(product => ({ ...product, path: state.path }));
+      if (isSearch) {
+        const modeLabel = { positive: "в наличии", zero: "без остатка", negative: "с минусовым остатком" }[state.stockMode];
+        subtitle.textContent = `Найдено: ${products.length} · ${modeLabel}`;
+      }
 
       productsEl.className = showPurchaseRecommendations ? "purchase-recommendations" : "product-list";
 
       draftEl.hidden = !showPurchaseRecommendations;
-      document.getElementById("recommendation-title").hidden = !showPurchaseRecommendations;
       document.getElementById("customer-orders-panel").hidden = !isOrdersView;
       document.getElementById("analysis-panel").hidden = !isAnalysisView;
       if (isAnalysisView) renderAnalysis();
@@ -1310,13 +1706,17 @@
         draftTitle.textContent = "Черновик закупки";
         const draftHint = document.createElement("div");
         draftHint.className = "group-meta";
-        draftHint.textContent = "Цены и бюджет относятся только к обычной закупке. Заказы покупателей учитываются в штуках. Черновик хранится на этом устройстве.";
+        draftHint.textContent = "Хранится на этом устройстве. Остатки на складе не меняются.";
         summary.append(draftTitle, draftHint);
 
         if (!state.purchase.length) {
           const empty = document.createElement("div");
-          empty.className = "empty";
-          empty.textContent = "Черновик пуст. Добавьте товары из остатков или популярных продаж ниже.";
+          empty.className = "purchase-empty";
+          const emptyTitle = document.createElement("strong"); emptyTitle.textContent = "Черновик пока пуст";
+          const emptyHint = document.createElement("p"); emptyHint.textContent = "Добавьте товары из остатков или популярных продаж ниже.";
+          const stockButton = makeButton("Открыть остатки", () => openPage(showDemo ? "/?demo=1" : "/"), "empty-action");
+          stockButton.type = "button";
+          empty.append(emptyTitle, emptyHint, stockButton);
           summary.append(empty);
         } else {
           state.purchase.forEach(item => {
@@ -1379,9 +1779,17 @@
         const units = state.purchase.reduce((sum, item) => sum + item.quantity, 0);
         const regularUnits = regularItems.reduce((sum, item) => sum + purchaseQuantity(item), 0);
         const orderUnits = units - regularUnits;
-        footerTotal.textContent = `${state.purchase.length} ${positionWord(state.purchase.length)} · ${units} шт.`
-          + (orderUnits ? ` · заказы покупателей: ${orderUnits} шт.` : "")
-          + (regularUnits ? ` · по закупочным ценам: ${purchaseTotal.toLocaleString("ru-RU")} ₽${unpricedItems ? ` · без цены: ${unpricedItems}` : ""}` : "");
+        const totalMain = document.createElement("strong"); totalMain.className = "purchase-total-main";
+        totalMain.textContent = `${state.purchase.length} ${positionWord(state.purchase.length)} · ${units} шт.`;
+        footerTotal.append(totalMain);
+        for (const detail of [
+          orderUnits ? `Заказы покупателей: ${orderUnits} шт.` : "",
+          regularUnits ? `По закупочным ценам: ${purchaseTotal.toLocaleString("ru-RU")} ₽` : "",
+          unpricedItems ? `Без цены: ${unpricedItems}` : "",
+        ].filter(Boolean)) {
+          const chip = document.createElement("span"); chip.className = "purchase-total-detail"; chip.textContent = detail;
+          footerTotal.append(chip);
+        }
         if (state.purchase.length) {
           const exportButton = makeButton("Сохранить черновик в PDF", sharePreparedPurchasePdf, "purchase-pdf-button");
           exportButton.type = "button";
@@ -1424,6 +1832,7 @@
 
       if (isOrdersView) {
         const orderList = document.getElementById("customer-orders-list");
+        document.getElementById("orders-list-count").textContent = state.customerOrdersLoading || state.customerOrdersError ? "" : `${state.customerOrders.length}`;
         orderList.replaceChildren();
         if (state.customerOrdersLoading) {
           orderList.append(Object.assign(document.createElement("div"), { className: "orders-empty", textContent: "Загружаем заказы…" }));
@@ -1490,19 +1899,20 @@
         childEntries.forEach(([name, child]) => {
           const card = document.createElement("button");
           card.className = "group-card";
-          const icon = document.createElement("span"); icon.className = "group-icon"; icon.textContent = "▦";
+          const icon = document.createElement("span"); icon.className = "group-icon"; icon.setAttribute("aria-hidden", "true");
+          icon.innerHTML = '<svg viewBox="0 0 24 24"><rect x="3.5" y="4" width="17" height="16" rx="2"/><path d="M3.5 9h17M9 9v11M15 9v11"/></svg>';
           const copy = document.createElement("span"); copy.className = "group-copy";
           const label = document.createElement("span"); label.className = "group-name"; label.textContent = name;
           const meta = document.createElement("span"); meta.className = "group-meta";
           meta.textContent = state.stockMode === "zero" ? `${allProducts(child).length} товаров с нулевым остатком`
             : state.stockMode === "negative" ? `${allProducts(child).length} товаров с минусовым остатком`
             : `${quantity(child)} шт. в наличии`;
-          const arrow = document.createElement("span"); arrow.className = "chevron"; arrow.textContent = "›";
+          const arrow = document.createElement("span"); arrow.className = "chevron"; arrow.setAttribute("aria-hidden", "true");
           copy.append(label, meta); card.append(icon, copy, arrow);
           card.addEventListener("click", () => navigate([...state.path, name], false));
           groupsEl.append(card);
         });
-        if (!childEntries.length && inventoryStatus === "live") {
+        if (!childEntries.length && ["live", "demo"].includes(inventoryStatus)) {
           const empty = document.createElement("div"); empty.className = "empty";
           empty.textContent = state.stockMode === "zero" ? "Товаров с нулевым остатком нет"
             : state.stockMode === "negative" ? "Товаров с минусовым остатком нет"
@@ -1561,7 +1971,14 @@
             ["cartridges", "Картриджи и испарители"],
             ["hookah_tobacco", "Табак для кальяна"],
           ];
-          purchaseCategories.forEach(([key, label]) => {
+          const filledCategories = purchaseCategories.filter(([key]) => products.some(product => product.category_key === key));
+          if (!filledCategories.length) {
+            const empty = document.createElement("div"); empty.className = "popular-empty";
+            const emptyTitle = document.createElement("strong"); emptyTitle.textContent = "Продаж за период нет";
+            const emptyHint = document.createElement("p"); emptyHint.textContent = "Попробуйте выбрать другой период или добавьте товары из остатков.";
+            empty.append(emptyTitle, emptyHint); productsEl.append(empty);
+          }
+          filledCategories.forEach(([key, label]) => {
             const categoryItems = products.filter(product => product.category_key === key);
             const section = document.createElement("section");
             section.className = "popular-category";
@@ -1569,17 +1986,10 @@
             heading.className = "popular-category-title";
             heading.textContent = `Топ‑5: ${label}`;
             section.append(heading);
-            if (categoryItems.length) {
-              const list = document.createElement("div");
-              list.className = "popular-category-list";
-              categoryItems.forEach(product => appendProductCard(list, product));
-              section.append(list);
-            } else {
-              const emptyCategory = document.createElement("div");
-              emptyCategory.className = "popular-category-empty";
-              emptyCategory.textContent = "За выбранный период продаж не найдено";
-              section.append(emptyCategory);
-            }
+            const list = document.createElement("div");
+            list.className = "popular-category-list";
+            categoryItems.forEach(product => appendProductCard(list, product));
+            section.append(list);
             productsEl.append(section);
           });
         } else {
@@ -1588,9 +1998,26 @@
 
         if (!products.length && (showProducts || isPurchase || isSearch) && (!isPurchase || state.purchaseLoading || state.purchaseError)) {
           const empty = document.createElement("div"); empty.className = "empty";
-          empty.textContent = isPurchase
-            ? state.purchaseLoading ? "Загружаем продажи по чекам…" : state.purchaseError ? "Не удалось загрузить продажи. Попробуйте ещё раз." : "За выбранный период продаж не найдено. Можно добавить товары через раздел «Остатки»."
-            : isSearch ? "Ничего не найдено" : "В этой категории пока нет товаров";
+          if (isSearch && inventoryStatus === "loading") {
+            empty.textContent = "Загружаем товары…";
+          } else if (isSearch && inventoryStatus === "error") {
+            empty.textContent = "Не удалось загрузить товары. Проверьте соединение и попробуйте ещё раз.";
+          } else if (isSearch) {
+            empty.classList.add("search-empty");
+            const emptyTitle = document.createElement("strong"); emptyTitle.textContent = "Товары не найдены";
+            const emptyHint = document.createElement("p"); emptyHint.textContent = `По запросу «${state.search.trim()}» нет товаров в выбранном остатке.`;
+            const clear = makeButton("Очистить поиск", () => {
+              state.search = "";
+              document.getElementById("search").value = "";
+              render();
+              document.getElementById("search").focus();
+            }, "empty-action");
+            empty.append(emptyTitle, emptyHint, clear);
+          } else {
+            empty.textContent = isPurchase
+              ? state.purchaseLoading ? "Загружаем продажи по чекам…" : state.purchaseError ? "Не удалось загрузить продажи. Попробуйте ещё раз." : "За выбранный период продаж не найдено. Можно добавить товары через раздел «Остатки»."
+              : "В этой категории пока нет товаров";
+          }
           productsEl.append(empty);
         }
       } else {
@@ -1601,8 +2028,22 @@
       badge.hidden = !state.purchase.length;
       badge.textContent = state.purchase.length;
       savePurchase();
-      document.getElementById("stock-tab").classList.toggle("active", !isPurchase);
-      document.getElementById("purchase-tab").classList.toggle("active", isPurchase);
+      for (const [id, active] of [["stock-tab", !isPurchase], ["purchase-tab", isPurchase && !isOrdersView && !isAnalysisView], ["orders-tab", isOrdersView], ["analysis-tab", isAnalysisView]]) {
+        const link = document.getElementById(id);
+        link.classList.toggle("active", active);
+        if (active) link.setAttribute("aria-current", "page");
+        else link.removeAttribute("aria-current");
+      }
+      const nav = document.querySelector(".nav-inner");
+      const activeIndex = !isPurchase ? "0" : isOrdersView ? "2" : isAnalysisView ? "3" : "1";
+      if (incomingNavIndex !== null && incomingNavIndex !== activeIndex) {
+        nav.dataset.active = incomingNavIndex;
+        incomingNavIndex = null;
+        requestAnimationFrame(() => requestAnimationFrame(() => { nav.dataset.active = activeIndex; }));
+      } else {
+        incomingNavIndex = null;
+        nav.dataset.active = activeIndex;
+      }
       preparePurchasePdf();
     }
 
@@ -1684,18 +2125,20 @@
       render();
     }
     preparePurchasePdf();
-    loadLiveInventory();
-    if (savedAddedOrderIds.size) loadCustomerOrders();
-    document.getElementById("orders-view-tab").addEventListener("click", async () => {
-      state.purchaseView = state.purchaseView === "orders" ? "popular" : "orders";
-      render();
-      if (state.purchaseView === "orders") await loadCustomerOrders();
-    });
-    document.getElementById("analysis-view-tab").addEventListener("click", () => {
-      state.purchaseView = state.purchaseView === "analysis" ? "popular" : "analysis";
-      render();
-      if (state.purchaseView === "analysis") loadAnalysis();
-    });
+    if (currentPage === "stock") loadLiveInventory();
+    else render();
+    if (currentPage === "popular") loadPurchaseGoods(state.purchasePeriod).catch(error => console.error("Не удалось загрузить популярные товары:", error));
+    if (currentPage === "orders" || savedAddedOrderIds.size) loadCustomerOrders();
+    if (currentPage === "analysis") loadAnalysis();
+    const orderPhotoInput = document.getElementById("order-photo");
+    const photoUpload = document.getElementById("photo-upload");
+    const photoUploadStatus = document.getElementById("photo-upload-status");
+    function updatePhotoUpload() {
+      const file = orderPhotoInput.files?.[0];
+      photoUpload.classList.toggle("has-file", Boolean(file));
+      photoUploadStatus.textContent = file ? file.name : "JPEG, PNG или WebP · до 5 МБ";
+    }
+    orderPhotoInput.addEventListener("change", updatePhotoUpload);
     document.getElementById("customer-order-form").addEventListener("submit", async event => {
       event.preventDefault();
       const form = event.currentTarget;
@@ -1726,6 +2169,7 @@
         });
         if (!response.ok) throw new Error((await response.text()) || `HTTP ${response.status}`);
         form.reset();
+        updatePhotoUpload();
         form.elements.quantity.value = "1";
         feedback.textContent = "Заказ сохранён.";
         await loadCustomerOrders();
@@ -1737,9 +2181,6 @@
         button.textContent = "Сохранить заказ";
       }
     });
-    document.getElementById("stock-tab").addEventListener("click", () => {
-      navigate([], false);
-    });
     document.querySelectorAll(".stock-filter").forEach(button => button.addEventListener("click", () => {
       if (state.stockMode === button.dataset.stockMode) return;
       state.stockMode = button.dataset.stockMode;
@@ -1748,18 +2189,6 @@
       document.getElementById("search").value = "";
       loadLiveInventory();
     }));
-    document.getElementById("purchase-tab").addEventListener("click", async () => {
-  state.purchaseView = "popular";
-  navigate(state.path, true);
-
-  try {
-    await loadPurchaseGoods(state.purchasePeriod);
-    render();
-  } catch (error) {
-    console.error("Не удалось загрузить популярные товары:", error);
-  }
-});
-
 async function selectPurchasePeriod(period) {
   document.getElementById("period-menu").hidden = true;
   document.getElementById("period-trigger").setAttribute("aria-expanded", "false");

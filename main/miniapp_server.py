@@ -705,6 +705,9 @@ async def start_miniapp_server():
             middlewares=[security_headers],
         )
         app.router.add_get("/", index_page)
+        app.router.add_get("/purchase", index_page)
+        app.router.add_get("/orders", index_page)
+        app.router.add_get("/analysis", index_page)
         app.router.add_static("/assets/", MINIAPP_ASSETS_DIR, show_index=False)
         app.router.add_get("/api/stock", stock_data)
         app.router.add_get("/api/purchase-price", purchase_price_data)
